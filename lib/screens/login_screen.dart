@@ -44,8 +44,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               Center(
+
                 child: RichText(
                   text: TextSpan(
+
                     children: [
                       TextSpan(
                         text: "Don't have an account? ",

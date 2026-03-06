@@ -5,6 +5,7 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:task_manager_app/widgets/heading_text_section.dart';
 
 class PinVerificationScreen extends StatefulWidget {
+  static const String name = '/Pin-Verify';
   const PinVerificationScreen({super.key});
 
   @override
@@ -85,6 +86,7 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
 
   void _clearText() {
     _pinCodeController.clear();
+    super.dispose();
   }
 }
 

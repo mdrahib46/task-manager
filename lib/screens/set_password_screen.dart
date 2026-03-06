@@ -4,6 +4,7 @@ import 'package:task_manager_app/widgets/custom_app_background.dart';
 import 'package:task_manager_app/widgets/heading_text_section.dart';
 
 class SetPasswordScreen extends StatefulWidget {
+  static const String name = '/Set-Password';
   const SetPasswordScreen({super.key});
 
   @override
@@ -57,5 +58,6 @@ class _SetPasswordScreenState extends State<SetPasswordScreen> {
   void _clearText(){
     _passwordTEController.clear();
     _confirmPassTEController.clear();
+    super.dispose();
   }
 }

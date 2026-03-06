@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:task_manager_app/widgets/auth_prompt_text_button.dart';
 import 'package:task_manager_app/widgets/custom_app_background.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:task_manager_app/widgets/heading_text_section.dart';
 
 class PinVerificationScreen extends StatefulWidget {
   const PinVerificationScreen({super.key});
@@ -23,26 +24,21 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Pin Verification',
-                style: Theme.of(context).textTheme.headlineMedium!.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              Text(
-                'A 6 digit verification pin has sent to your email address',
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: Colors.grey,
-                ),
+              HeadingTextSection(
+                title: 'Pin Verification',
+                subTitle:
+                    'A 6 digit verification pin has sent to your email address',
               ),
               const SizedBox(height: 16),
               _buildPinCodeInput(),
-              const SizedBox(height: 20,),
-              ElevatedButton(onPressed: (){}, child: Text('Verify')),
-              const SizedBox(height: 40,),
-              AuthPromptTextButton(promptText: 'Have account? ', actionText: 'Sign in', onTap: (){})
-
+              const SizedBox(height: 20),
+              ElevatedButton(onPressed: () {}, child: Text('Verify')),
+              const SizedBox(height: 40),
+              AuthPromptTextButton(
+                promptText: 'Have account? ',
+                actionText: 'Sign in',
+                onTap: () {},
+              ),
             ],
           ),
         ),
@@ -91,3 +87,5 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
     _pinCodeController.clear();
   }
 }
+
+

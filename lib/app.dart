@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:task_manager_app/screens/email_verify_screen.dart';
 import 'package:task_manager_app/screens/login_screen.dart';
-import 'package:task_manager_app/screens/splash_screen.dart';
+import 'package:task_manager_app/screens/pin_verify_screen.dart';
 import 'package:task_manager_app/utils/themes/light_theme.dart';
 
 class MyApp extends StatelessWidget {
@@ -9,10 +10,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       themeMode: ThemeMode.system,
       theme: lightTheme,
-      home: const LoginScreen(),
+      home: const PinVerificationScreen(),
     );
   }
 }

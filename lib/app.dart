@@ -6,6 +6,7 @@ import 'package:task_manager_app/screens/email_verify_screen.dart';
 import 'package:task_manager_app/screens/inProgress_task_screen.dart';
 import 'package:task_manager_app/screens/main_bottom_nav_screen.dart';
 import 'package:task_manager_app/screens/new_task_screen.dart';
+import 'package:task_manager_app/screens/update_profile_screen.dart';
 import 'package:task_manager_app/screens/signin_screen.dart';
 import 'package:task_manager_app/screens/pin_verify_screen.dart';
 import 'package:task_manager_app/screens/set_password_screen.dart';
@@ -50,6 +51,8 @@ class MyApp extends StatelessWidget {
           widget = CanceledTaskScreen();
         }else if(settings.name == InProgressTaskScreen.name){
           widget = InProgressTaskScreen();
+        }else if(settings.name == UpdateProfileScreen.name){
+          widget = UpdateProfileScreen();
         }
 
         else{

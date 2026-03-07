@@ -11,6 +11,9 @@ class CreateNewTaskScreen extends StatefulWidget {
 }
 
 class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
+  final TextEditingController _subjectTEController = TextEditingController();
+  final TextEditingController _descriptionTEController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,9 +32,12 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              TextFormField(decoration: InputDecoration(hintText: 'Subject')),
+              TextFormField(
+                  controller: _subjectTEController,
+                  decoration: InputDecoration(hintText: 'Subject')),
               const SizedBox(height: 10),
               TextFormField(
+                controller: _descriptionTEController,
                 decoration: InputDecoration(hintText: 'Description'),
                 maxLines: 10,
               ),
@@ -45,5 +51,11 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
         ),
       ),
     );
+  }
+
+  void _clearText(){
+    _subjectTEController.clear();
+    _descriptionTEController.clear();
+    super.dispose();
   }
 }

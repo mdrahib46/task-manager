@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:task_manager_app/screens/update_profile_screen.dart';
 class TMAppBar extends StatelessWidget implements PreferredSizeWidget {
   const TMAppBar({super.key});
 
@@ -6,7 +7,9 @@ class TMAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+        Navigator.pushNamed(context, UpdateProfileScreen.name);
+      },
       child: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.green,

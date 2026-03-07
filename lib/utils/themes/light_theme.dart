@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 ThemeData lightTheme = ThemeData(
-  // colorScheme: .fromSeed(seedColor: Colors.green),
+  colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
 
   /// Input Decoration Theme
   inputDecorationTheme: InputDecorationTheme(
@@ -43,4 +43,10 @@ ThemeData lightTheme = ThemeData(
     selectionColor: Colors.greenAccent,
     selectionHandleColor: Colors.green,
   ),
+  
+  floatingActionButtonTheme: FloatingActionButtonThemeData(
+    backgroundColor: Colors.green,
+    foregroundColor: Colors.white,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100),)
+  )
 );

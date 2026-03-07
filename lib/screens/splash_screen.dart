@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:task_manager_app/screens/login_screen.dart';
+import 'package:task_manager_app/screens/signin_screen.dart';
 import 'package:task_manager_app/utils/asset_path.dart';
 import 'package:task_manager_app/widgets/custom_app_background.dart';
 
@@ -18,7 +18,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if(mounted){
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => LoginScreen()),
+        MaterialPageRoute(builder: (context) => SignInScreen()),
             (route) => false,
       );
     }

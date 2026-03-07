@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:task_manager_app/screens/signin_screen.dart';
 import 'package:task_manager_app/widgets/auth_prompt_text_button.dart';
 import 'package:task_manager_app/widgets/custom_app_background.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
@@ -38,7 +39,9 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
               AuthPromptTextButton(
                 promptText: 'Have account? ',
                 actionText: 'Sign in',
-                onTap: () {},
+                onTap: () {
+                  Navigator.pushNamed(context, SignInScreen.name);
+                },
               ),
             ],
           ),
@@ -89,5 +92,3 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
     super.dispose();
   }
 }
-
-

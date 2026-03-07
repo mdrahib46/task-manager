@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:task_manager_app/screens/signin_screen.dart';
 import 'package:task_manager_app/widgets/auth_prompt_text_button.dart';
 import 'package:task_manager_app/widgets/custom_app_background.dart';
 
@@ -11,7 +12,6 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
-
   final TextEditingController _emailTEController = TextEditingController();
   final TextEditingController _firstNameTEController = TextEditingController();
   final TextEditingController _lastNameTEController = TextEditingController();
@@ -33,7 +33,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: 16,),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _emailTEController,
                 decoration: InputDecoration(hintText: 'Email'),
@@ -110,11 +110,18 @@ class _SignupScreenState extends State<SignupScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              ElevatedButton(onPressed: (){}, child: Icon(Icons.arrow_forward_ios_rounded)),
-              const SizedBox(
-                height: 40,
+              ElevatedButton(
+                onPressed: () {},
+                child: Icon(Icons.arrow_forward_ios_rounded),
               ),
-              AuthPromptTextButton(promptText: "Have account? ", actionText: 'Sign in', onTap: (){})
+              const SizedBox(height: 40),
+              AuthPromptTextButton(
+                promptText: "Have account? ",
+                actionText: 'Sign in',
+                onTap: () {
+                  Navigator.pushNamed(context, SignInScreen.name);
+                },
+              ),
             ],
           ),
         ),
@@ -122,7 +129,7 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  void _clearText(){
+  void _clearText() {
     _emailTEController.clear();
     _firstNameTEController.clear();
     _lastNameTEController.clear();

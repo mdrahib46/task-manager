@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:task_manager_app/screens/main_bottom_nav_screen.dart';
+import 'package:task_manager_app/screens/signup_screen.dart';
 import 'package:task_manager_app/widgets/auth_prompt_text_button.dart';
 import 'package:task_manager_app/widgets/custom_app_background.dart';
 
-class LoginScreen extends StatefulWidget {
+class SignInScreen extends StatefulWidget {
   static const String name = '/Login-Screen';
-  const LoginScreen({super.key});
+  const SignInScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<SignInScreen> createState() => _SignInScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignInScreenState extends State<SignInScreen> {
   final TextEditingController _emailTEController = TextEditingController();
   final TextEditingController _passwordTEController = TextEditingController();
   @override
@@ -65,7 +67,9 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushNamed(context, MainBottomNavScreen.name);
+                },
                 child: Icon(Icons.arrow_forward_ios_rounded),
               ),
 
@@ -79,7 +83,9 @@ class _LoginScreenState extends State<LoginScreen> {
               AuthPromptTextButton(
                 promptText: "Don't have an account? ",
                 actionText: 'Sing Up',
-                onTap: () {},
+                onTap: () {
+                  Navigator.pushNamed(context, SignupScreen.name);
+                },
               ),
             ],
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:task_manager_app/screens/signin_screen.dart';
 import 'package:task_manager_app/widgets/auth_prompt_text_button.dart';
 import 'package:task_manager_app/widgets/custom_app_background.dart';
 import 'package:task_manager_app/widgets/heading_text_section.dart';
@@ -62,7 +63,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                 AuthPromptTextButton(
                   promptText: 'Have an account? ',
                   actionText: 'Sign in',
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.pushNamed(context, SignInScreen.name);
+                  },
                 ),
               ],
             ),

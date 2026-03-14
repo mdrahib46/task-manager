@@ -1,31 +1,49 @@
+import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:task_manager_app/data/models/user_model.dart';
 
 class AuthController {
   AuthController._();
   static const String _accessTokenKey = 'access-token';
+  static const String _userDataKey = 'user-data';
 
   static String? accessToken;
+  static UserModel? userModel;
 
-  static Future<void> saveAccessToken(String token) async {
+  static Future<void> saveUserData(
+    String accessToken,
+    UserModel userModel,
+  ) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    sharedPreferences.setString(_accessTokenKey, token);
-    accessToken = token;
+    await sharedPreferences.setString(_accessTokenKey, accessToken);
+    await sharedPreferences.setString(
+      _userDataKey,
+      jsonEncode(userModel.toJson()),
+    );
   }
 
-  static Future<String?> getAccessToken() async {
+  static Future<void> getUserData() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    accessToken = sharedPreferences.getString(_accessTokenKey);
+    userModel = UserModel.fromJson(
+      jsonDecode(sharedPreferences.getString(_userDataKey)!),
+    );
+  }
+
+  Future<bool> isUserLoggedIn() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String? token = sharedPreferences.getString(_accessTokenKey);
-    accessToken = token;
-    return token;
+    if (token != null) {
+      await getUserData();
+      return true;
+    } else {
+      return false;
+    }
   }
 
-  static bool isLoggedIn() {
-    return accessToken != null;
-  }
-
-  static Future<void> clearUserData() async {
+  Future<void> clearData() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    await sharedPreferences.clear();
-    accessToken = null;
+    sharedPreferences.clear();
   }
 }

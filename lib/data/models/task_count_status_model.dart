@@ -1,15 +1,15 @@
 class TaskCountStatusModel {
   String? status;
-  List<Data>? data;
+  List<TaskCountMode>? data;
 
   TaskCountStatusModel({this.status, this.data});
 
   TaskCountStatusModel.fromJson(Map<String, dynamic> json) {
     status = json['status'];
     if (json['data'] != null) {
-      data = <Data>[];
+      data = <TaskCountMode>[];
       json['data'].forEach((v) {
-        data!.add(Data.fromJson(v));
+        data!.add(TaskCountMode.fromJson(v));
       });
     }
   }
@@ -24,13 +24,13 @@ class TaskCountStatusModel {
   }
 }
 
-class Data {
+class TaskCountMode {
   String? sId;
   int? sum;
 
-  Data({this.sId, this.sum});
+  TaskCountMode({this.sId, this.sum});
 
-  Data.fromJson(Map<String, dynamic> json) {
+  TaskCountMode.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];
     sum = json['sum'];
   }

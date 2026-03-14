@@ -25,6 +25,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   bool _inProgress = false;
+  bool _isObSecure = true;
 
   @override
   Widget build(BuildContext context) {
@@ -57,11 +58,9 @@ class _SignupScreenState extends State<SignupScreen> {
                     final emailRegexp = RegExp(
                       r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
                     );
-
                     if (!emailRegexp.hasMatch(value.trim())) {
                       return "Enter a valid email";
                     }
-
                     return null;
                   },
                 ),
@@ -115,8 +114,20 @@ class _SignupScreenState extends State<SignupScreen> {
                 const SizedBox(height: 10),
                 TextFormField(
                   controller: _passwordTEController,
+                  obscureText: _isObSecure,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
-                  decoration: InputDecoration(hintText: 'Password'),
+                  decoration: InputDecoration(
+                    hintText: 'Password',
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        _isObSecure = !_isObSecure;
+                        setState(() {});
+                      },
+                      icon: _isObSecure
+                          ? Icon(Icons.visibility)
+                          : Icon(Icons.visibility_off),
+                    ),
+                  ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return "Please enter your password";
@@ -183,6 +194,11 @@ class _SignupScreenState extends State<SignupScreen> {
         showSnackBarMessage(
           context: context,
           message: 'Account successfully created....!',
+        );
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          SignInScreen.name,
+          (route) => false,
         );
       }
     } else {

@@ -1,25 +1,4 @@
 class UserModel {
-  String? status;
-  Data? data;
-
-  UserModel({this.status, this.data});
-
-  UserModel.fromJson(Map<String, dynamic> json) {
-    status = json['status'];
-    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['status'] = status;
-    if (this.data != null) {
-      data['data'] = this.data!.toJson();
-    }
-    return data;
-  }
-}
-
-class Data {
   String? email;
   String? firstName;
   String? lastName;
@@ -29,7 +8,7 @@ class Data {
   String? createdDate;
   String? sId;
 
-  Data(
+  UserModel(
       {this.email,
         this.firstName,
         this.lastName,
@@ -39,7 +18,7 @@ class Data {
         this.createdDate,
         this.sId});
 
-  Data.fromJson(Map<String, dynamic> json) {
+  UserModel.fromJson(Map<String, dynamic> json) {
     email = json['email'];
     firstName = json['firstName'];
     lastName = json['lastName'];

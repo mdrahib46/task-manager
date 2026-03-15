@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
+import 'package:task_manager_app/controller/auth_controller.dart';
 import 'package:task_manager_app/data/models/network_response.dart';
 
 class ApiCaller {
@@ -55,7 +56,7 @@ class ApiCaller {
       Uri uri = Uri.parse(url);
       Map<String, String> headers = {
         "Content-Type": "application/json",
-
+        'token' : AuthController.accessToken.toString()
       };
 
       _logRequest(url);

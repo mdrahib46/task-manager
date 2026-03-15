@@ -24,11 +24,11 @@ class TMAppBar extends StatelessWidget implements PreferredSizeWidget {
           children: [
             CircleAvatar(
               backgroundColor: Colors.white,
-              backgroundImage: NetworkImage(
-                _profilePhoto!,
-              ),
+              backgroundImage:
+                  (_profilePhoto != null && _profilePhoto.isNotEmpty)
+                  ? NetworkImage(_profilePhoto)
+                  : AssetImage('assets/images/avatar.jpg') as ImageProvider,
               radius: 16,
-
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -44,7 +44,7 @@ class TMAppBar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                   ),
                   Text(
-                   _email!,
+                    _email!,
                     style: TextStyle(fontSize: 14, color: Colors.white),
                   ),
                 ],

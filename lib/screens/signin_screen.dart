@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:task_manager_app/controller/auth_controller.dart';
 import 'package:task_manager_app/data/models/network_response.dart';
+import 'package:task_manager_app/data/models/user_model.dart';
 import 'package:task_manager_app/data/services/api_response.dart';
 import 'package:task_manager_app/screens/main_bottom_nav_screen.dart';
 import 'package:task_manager_app/screens/signup_screen.dart';
@@ -134,7 +135,10 @@ class _SignInScreenState extends State<SignInScreen> {
     setState(() {});
 
     if (response.isSuccess) {
-      await AuthController.saveAccessToken(response.responseData['token']);
+      await AuthController.saveUserData(
+        response.responseData['token'],
+        UserModel.fromJson(response.responseData['data']),
+      );
 
       if (mounted) {
         showSnackBarMessage(context: context, message: 'Login successful!');
@@ -144,7 +148,6 @@ class _SignInScreenState extends State<SignInScreen> {
           (route) => false,
         );
       }
-
       _clearText();
     } else {
       if (mounted) {

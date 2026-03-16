@@ -15,8 +15,12 @@ class ApiCaller {
       Uri uri = Uri.parse(url);
 
       _logRequest(uri.toString());
+      Map<String, String> headers = {
+        "Content-Type": "application/json",
+        'token' : AuthController.accessToken.toString()
+      };
 
-      http.Response response = await http.get(uri);
+      http.Response response = await http.get(uri, headers: headers);
 
       _logger.i("Request Response : ${response.body}");
       dynamic decodedResponse;

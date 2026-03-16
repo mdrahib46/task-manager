@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:task_manager_app/data/models/network_response.dart';
+import 'package:task_manager_app/data/models/task_model.dart';
+import 'package:task_manager_app/data/services/api_response.dart';
+import 'package:task_manager_app/utils/app_urls.dart';
+import 'package:task_manager_app/widgets/snackbar_message.dart';
 import 'package:task_manager_app/widgets/task_card_tile.dart';
-
 
 class CompletedTaskScreen extends StatefulWidget {
   static const String name = 'Completed-Task';
@@ -11,30 +15,67 @@ class CompletedTaskScreen extends StatefulWidget {
 }
 
 class _CompletedTaskScreenState extends State<CompletedTaskScreen> {
+  bool _inProgress = false;
+  List<TaskModel> _completeTaskList = [];
+
+  @override
+  void initState() {
+    _fetchCompleteTask();
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          child: ListView.builder(
-            padding: EdgeInsets.zero,
-            itemCount: 10,
-            itemBuilder: (context, index) {
-              return TaskCardTile(
-                title: 'What is Lorem Ipsum?',
-                subTitle:
-                'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s,',
-                status: 'Completed',
+          child: Visibility(
+            visible:  !_inProgress,
+            replacement: Center(child: CircularProgressIndicator(),),
+            child: _completeTaskList.isEmpty ? Center(child: Text('No data available...!'),) :  ListView.builder(
+              padding: EdgeInsets.zero,
+              itemCount: _completeTaskList.length,
+              itemBuilder: (context, index) {
+                final task = _completeTaskList[index];
+                return TaskCardTile(
+                  title: task.title ?? '',
+                  subTitle:
+                     task.description ?? '',
+                  status: task.status ?? '',
 
-                date: 'Date: ${DateTime.now().toString().split(' ')[0]}',
-                onTapEdit: () {},
-                onTapDelete: () {},
-              );
-            },
+                  date: 'Date: ${task.createdDate}',
+                  onTapEdit: () {},
+                  onTapDelete: () {},
+                );
+              },
+            ),
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _fetchCompleteTask() async {
+    _inProgress = true;
+    setState(() {});
+
+    final NetworkResponse response = await ApiCaller.getRequest(
+      url: AppUrls.getCompletedTask,
+    );
+    _inProgress = false;
+    setState(() {});
+
+    if (response.isSuccess) {
+      final TaskListModel taskListModel = TaskListModel.fromJson(
+        response.responseData,
+      );
+      _completeTaskList = taskListModel.data ?? [];
+    } else {
+      if (mounted) {
+        showSnackBarMessage(context: context, message: response.errorMessage, isError: true);
+      }
+    }
   }
 }

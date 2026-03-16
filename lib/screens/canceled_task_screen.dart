@@ -44,7 +44,7 @@ class _CanceledTaskScreenState extends State<CanceledTaskScreen> {
                   status: task.status ?? '',
                   date: 'Date: ${task.createdDate ?? ''}',
                   onTapEdit: () {},
-                  onTapDelete: () {},
+                  onTapDelete: (){},
                 );
               },
             ),

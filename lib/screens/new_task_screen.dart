@@ -47,86 +47,61 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
         child: SafeArea(
           child: Column(
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Visibility(
-                      visible: !_getTaskStatusCountInProgress,
-                      replacement: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
+              Visibility(
+                visible: !_getTaskStatusCountInProgress,
+                replacement: LinearProgressIndicator(),
+                child: Row(
+                  children: [
+                    Expanded(
                       child: TaskSummaryCard(
                         taskCount: _getStatusCount('New'),
                         cardTitle: 'New',
                       ),
                     ),
-                  ),
-                  Expanded(
-                    child: Visibility(
-                      visible: !_getTaskStatusCountInProgress,
-                      replacement: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
+                    Expanded(
                       child: TaskSummaryCard(
                         taskCount: _getStatusCount('Completed'),
                         cardTitle: 'Completed',
                       ),
                     ),
-                  ),
-                  Expanded(
-                    child: Visibility(
-                      visible: !_getTaskStatusCountInProgress,
-                      replacement: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
+                    Expanded(
                       child: TaskSummaryCard(
                         taskCount: _getStatusCount('Pending'),
                         cardTitle: 'Progress',
                       ),
                     ),
-                  ),
-                  Expanded(
-                    child: Visibility(
-                      visible: !_getTaskStatusCountInProgress,
-                      replacement: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
+                    Expanded(
                       child: TaskSummaryCard(
                         taskCount: _getStatusCount('Canceled'),
                         cardTitle: 'Canceled',
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-
 
               Expanded(
                 child: Visibility(
                   visible: !_newTaskInProgress,
-                  replacement: const Center(
-                    child: CircularProgressIndicator(),
-                  ),
+                  replacement: const Center(child: CircularProgressIndicator()),
                   child: newTaskList.isEmpty
-                      ? const Center(
-                    child: Text('No task available ....!'),
-                  )
+                      ? const Center(child: Text('No task available ....!'))
                       : ListView.builder(
-                    padding: EdgeInsets.zero,
-                    itemCount: newTaskList.length,
-                    itemBuilder: (context, index) {
-                      final task = newTaskList[index];
+                          padding: EdgeInsets.zero,
+                          itemCount: newTaskList.length,
+                          itemBuilder: (context, index) {
+                            final task = newTaskList[index];
 
-                      return TaskCardTile(
-                        title: task.title ?? '',
-                        subTitle: task.description ?? '',
-                        status: task.status ?? '',
-                        date: 'Date: ${task.createdDate ?? ''}',
-                        onTapEdit: () {},
-                        onTapDelete: () {},
-                      );
-                    },
-                  ),
+                            return TaskCardTile(
+                              title: task.title ?? '',
+                              subTitle: task.description ?? '',
+                              status: task.status ?? '',
+                              date: 'Date: ${task.createdDate ?? ''}',
+                              onTapEdit: () {},
+                              onTapDelete: ()=> _onTapDeleteTask(task.sId ?? ''),
+                            );
+                          },
+                        ),
                 ),
               ),
             ],
@@ -135,7 +110,6 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
       ),
     );
   }
-
 
   String _getStatusCount(String status) {
     for (TaskCountModel model in taskStatusCountList) {
@@ -159,7 +133,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
     setState(() {});
     if (response.isSuccess) {
       final TaskCountStatusListModel taskCountStatusListModel =
-      TaskCountStatusListModel.fromJson(response.responseData);
+          TaskCountStatusListModel.fromJson(response.responseData);
 
       taskStatusCountList = taskCountStatusListModel.data ?? [];
     } else {
@@ -181,10 +155,43 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
     );
 
     if (response.isSuccess) {
-      final TaskListModel taskListModel =
-      TaskListModel.fromJson(response.responseData);
+      final TaskListModel taskListModel = TaskListModel.fromJson(
+        response.responseData,
+      );
 
       newTaskList = taskListModel.data ?? [];
+    } else {
+      if (mounted) {
+        showSnackBarMessage(
+          context: context,
+          message: response.errorMessage,
+          isError: true,
+        );
+      }
+    }
+
+    _newTaskInProgress = false;
+    setState(() {});
+  }
+
+  Future<void> _onTapDeleteTask(String id) async {
+    _newTaskInProgress = true;
+    setState(() {});
+
+    final NetworkResponse response = await ApiCaller.getRequest(
+      url: AppUrls.deleteTask(id: id),
+    );
+
+
+    if (response.isSuccess) {
+      await _getNetTask();
+      await _getTaskStatusCount();
+      if (mounted) {
+        showSnackBarMessage(
+          context: context,
+          message: 'Task has been deleted....!',
+        );
+      }
     } else {
       if (mounted) {
         showSnackBarMessage(

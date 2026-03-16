@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:task_manager_app/data/models/network_response.dart';
+import 'package:task_manager_app/data/models/task_count_status_model.dart';
 import 'package:task_manager_app/data/models/task_model.dart';
 import 'package:task_manager_app/data/services/api_response.dart';
 import 'package:task_manager_app/utils/app_urls.dart';
@@ -11,6 +12,7 @@ import 'create_new_task_screen.dart';
 
 class NewTaskScreen extends StatefulWidget {
   static const String name = '/New-Task-Screen';
+
   const NewTaskScreen({super.key});
 
   @override
@@ -18,13 +20,17 @@ class NewTaskScreen extends StatefulWidget {
 }
 
 class _NewTaskScreenState extends State<NewTaskScreen> {
-  bool _inProgress = false;
+  bool _newTaskInProgress = false;
+  bool _getTaskStatusCountInProgress = false;
+
   List<TaskModel> newTaskList = [];
+  List<TaskCountModel> taskStatusCountList = [];
 
   @override
   void initState() {
-    _getNetTask();
     super.initState();
+    _getNetTask();
+    _getTaskStatusCount();
   }
 
   @override
@@ -34,48 +40,84 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
         onPressed: () {
           Navigator.pushNamed(context, CreateNewTaskScreen.name);
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         child: SafeArea(
           child: Column(
             children: [
               Row(
                 children: [
                   Expanded(
-                    child: TaskSummaryCard(taskCount: '09', cardTitle: 'New'),
-                  ),
-                  Expanded(
-                    child: TaskSummaryCard(
-                      taskCount: '09',
-                      cardTitle: 'Completed',
+                    child: Visibility(
+                      visible: !_getTaskStatusCountInProgress,
+                      replacement: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                      child: TaskSummaryCard(
+                        taskCount: _getStatusCount('New'),
+                        cardTitle: 'New',
+                      ),
                     ),
                   ),
                   Expanded(
-                    child: TaskSummaryCard(
-                      taskCount: '09',
-                      cardTitle: 'Progress',
+                    child: Visibility(
+                      visible: !_getTaskStatusCountInProgress,
+                      replacement: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                      child: TaskSummaryCard(
+                        taskCount: _getStatusCount('Completed'),
+                        cardTitle: 'Completed',
+                      ),
                     ),
                   ),
                   Expanded(
-                    child: TaskSummaryCard(
-                      taskCount: '09',
-                      cardTitle: 'Canceled',
+                    child: Visibility(
+                      visible: !_getTaskStatusCountInProgress,
+                      replacement: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                      child: TaskSummaryCard(
+                        taskCount: _getStatusCount('Pending'),
+                        cardTitle: 'Progress',
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Visibility(
+                      visible: !_getTaskStatusCountInProgress,
+                      replacement: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                      child: TaskSummaryCard(
+                        taskCount: _getStatusCount('Canceled'),
+                        cardTitle: 'Canceled',
+                      ),
                     ),
                   ),
                 ],
               ),
+
+
               Expanded(
                 child: Visibility(
-                  visible: !_inProgress,
-                  replacement: Center(child: CircularProgressIndicator()),
-                  child: ListView.builder(
+                  visible: !_newTaskInProgress,
+                  replacement: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                  child: newTaskList.isEmpty
+                      ? const Center(
+                    child: Text('No task available ....!'),
+                  )
+                      : ListView.builder(
                     padding: EdgeInsets.zero,
                     itemCount: newTaskList.length,
                     itemBuilder: (context, index) {
                       final task = newTaskList[index];
-                      return newTaskList.isEmpty ?  Center(child: Text('No task available ....!')) : TaskCardTile(
+
+                      return TaskCardTile(
                         title: task.title ?? '',
                         subTitle: task.description ?? '',
                         status: task.status ?? '',
@@ -94,30 +136,66 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
     );
   }
 
+
+  String _getStatusCount(String status) {
+    for (TaskCountModel model in taskStatusCountList) {
+      if (model.sId == status) {
+        return model.sum.toString();
+      }
+    }
+    return '0';
+  }
+
+  Future<void> _getTaskStatusCount() async {
+    _getTaskStatusCountInProgress = true;
+    setState(() {});
+
+    final NetworkResponse response = await ApiCaller.getRequest(
+      url: AppUrls.taskStatusCount,
+    );
+    _getTaskStatusCountInProgress = false;
+    setState(() {});
+    _getTaskStatusCountInProgress = false;
+    setState(() {});
+    if (response.isSuccess) {
+      final TaskCountStatusListModel taskCountStatusListModel =
+      TaskCountStatusListModel.fromJson(response.responseData);
+
+      taskStatusCountList = taskCountStatusListModel.data ?? [];
+    } else {
+      if (mounted) {
+        showSnackBarMessage(
+          context: context,
+          message: 'Something went wrong....!',
+        );
+      }
+    }
+  }
+
   Future<void> _getNetTask() async {
-    _inProgress = true;
+    _newTaskInProgress = true;
     setState(() {});
 
     final NetworkResponse response = await ApiCaller.getRequest(
       url: AppUrls.getNewTask,
     );
 
-    _inProgress = false;
-    setState(() {});
-
     if (response.isSuccess) {
-      final TaskListModel taskListModel = TaskListModel.fromJson(
-        response.responseData,
-      );
+      final TaskListModel taskListModel =
+      TaskListModel.fromJson(response.responseData);
+
       newTaskList = taskListModel.data ?? [];
     } else {
       if (mounted) {
         showSnackBarMessage(
           context: context,
           message: response.errorMessage,
-          isError: false,
+          isError: true,
         );
       }
     }
+
+    _newTaskInProgress = false;
+    setState(() {});
   }
 }

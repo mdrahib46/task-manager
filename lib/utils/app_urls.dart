@@ -12,6 +12,7 @@ class AppUrls {
   static const String getCanceledTask = '$_baseUrl/listTaskByStatus/Canceled';
   static const String getPendingTask = '$_baseUrl/listTaskByStatus/Pending';
   static const String createTask = '$_baseUrl/createTask';
+  static const String taskStatusCount = '$_baseUrl/taskStatusCount';
 
 
   // static const String

@@ -61,13 +61,14 @@ class _CanceledTaskScreenState extends State<CanceledTaskScreen> {
     final NetworkResponse response = await ApiCaller.getRequest(
       url: AppUrls.getCanceledTask,
     );
-    _inProgress = false;
-    setState(() {});
+
     if (response.isSuccess) {
       final TaskListModel taskListModel = TaskListModel.fromJson(
         response.responseData,
       );
       canceledTaskList = taskListModel.data ?? [];
+      _inProgress = false;
+      setState(() {});
     } else {
       if (mounted) {
         showSnackBarMessage(

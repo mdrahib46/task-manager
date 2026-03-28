@@ -7,7 +7,9 @@ import 'package:task_manager_app/widgets/heading_text_section.dart';
 
 class PinVerificationScreen extends StatefulWidget {
   static const String name = '/Pin-Verify';
-  const PinVerificationScreen({super.key});
+  const PinVerificationScreen({super.key, required this.email});
+
+  final String email;
 
   @override
   State<PinVerificationScreen> createState() => _PinVerificationScreenState();

@@ -15,14 +15,19 @@ class ApiCaller {
       Uri uri = Uri.parse(url);
 
       _logRequest(uri.toString());
+
       Map<String, String> headers = {
         "Content-Type": "application/json",
-        'token' : AuthController.accessToken.toString()
       };
+
+      if (AuthController.accessToken != null) {
+        headers['token'] = AuthController.accessToken!;
+      }
 
       http.Response response = await http.get(uri, headers: headers);
 
       _logger.i("Request Response : ${response.body}");
+
       dynamic decodedResponse;
       try {
         decodedResponse = jsonDecode(response.body);
@@ -31,6 +36,16 @@ class ApiCaller {
       }
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
+        if (decodedResponse is Map<String, dynamic> &&
+            decodedResponse['status'] == 'fail') {
+          return NetworkResponse(
+            isSuccess: false,
+            statusCode: response.statusCode,
+            errorMessage:
+            decodedResponse['data'] ?? 'Something went wrong!',
+          );
+        }
+
         return NetworkResponse(
           isSuccess: true,
           statusCode: response.statusCode,
@@ -40,16 +55,18 @@ class ApiCaller {
         return NetworkResponse(
           isSuccess: false,
           statusCode: response.statusCode,
-          responseData: decodedResponse,
           errorMessage: 'Request failed. Please try again.',
+          responseData: decodedResponse,
         );
       }
     } catch (e) {
+      _logger.e("Exception: $e");
+
       return NetworkResponse(
         isSuccess: false,
         statusCode: -1,
-        responseData: null,
         errorMessage: 'Unable to connect to the server.',
+        responseData: null,
       );
     }
   }

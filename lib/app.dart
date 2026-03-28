@@ -25,43 +25,41 @@ class MyApp extends StatelessWidget {
       themeMode: ThemeMode.system,
       theme: lightTheme,
       initialRoute: SplashScreen.name,
-      onGenerateRoute: (RouteSettings settings){
+      onGenerateRoute: (RouteSettings settings) {
         late Widget widget;
-        if(settings.name == SplashScreen.name){
+        if (settings.name == SplashScreen.name) {
           widget = SplashScreen();
-        }else if(settings.name == SignInScreen.name){
+        } else if (settings.name == SignInScreen.name) {
           widget = SignInScreen();
-        }else if(settings.name == SignupScreen.name){
+        } else if (settings.name == SignupScreen.name) {
           widget = SignupScreen();
-        }else if(settings.name == SetPasswordScreen.name){
+        } else if (settings.name == SetPasswordScreen.name) {
           widget = SetPasswordScreen();
-        }else if(settings.name == PinVerificationScreen.name){
-          widget = PinVerificationScreen();
-        }else if (settings.name == EmailVerificationScreen.name){
+        } else if (settings.name == PinVerificationScreen.name) {
+          String email = settings.arguments as String;
+          widget = PinVerificationScreen(email: email);
+        } else if (settings.name == EmailVerificationScreen.name) {
           widget = EmailVerificationScreen();
-        }else if(settings.name == MainBottomNavScreen.name){
+        } else if (settings.name == MainBottomNavScreen.name) {
           widget = MainBottomNavScreen();
-        }else if(settings.name == CreateNewTaskScreen.name){
+        } else if (settings.name == CreateNewTaskScreen.name) {
           widget = CreateNewTaskScreen();
-        }else if(settings.name == NewTaskScreen.name){
+        } else if (settings.name == NewTaskScreen.name) {
           widget = NewTaskScreen();
-        }else if(settings.name == CompletedTaskScreen.name){
+        } else if (settings.name == CompletedTaskScreen.name) {
           widget = CompletedTaskScreen();
-        }else if(settings.name == CanceledTaskScreen.name){
+        } else if (settings.name == CanceledTaskScreen.name) {
           widget = CanceledTaskScreen();
-        }else if(settings.name == InProgressTaskScreen.name){
+        } else if (settings.name == InProgressTaskScreen.name) {
           widget = InProgressTaskScreen();
-        }else if(settings.name == UpdateProfileScreen.name){
+        } else if (settings.name == UpdateProfileScreen.name) {
           widget = UpdateProfileScreen();
+        } else {
+          widget = Scaffold(body: Text('No route found....!'));
         }
 
-        else{
-          widget = Scaffold(body: Text('No route found....!'),);
-        }
-
-        return MaterialPageRoute(builder: (context)=> widget);
+        return MaterialPageRoute(builder: (context) => widget);
       },
-
     );
   }
 }

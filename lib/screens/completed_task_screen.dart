@@ -64,14 +64,15 @@ class _CompletedTaskScreenState extends State<CompletedTaskScreen> {
     final NetworkResponse response = await ApiCaller.getRequest(
       url: AppUrls.getCompletedTask,
     );
-    _inProgress = false;
-    setState(() {});
+
 
     if (response.isSuccess) {
       final TaskListModel taskListModel = TaskListModel.fromJson(
         response.responseData,
       );
       _completeTaskList = taskListModel.data ?? [];
+      _inProgress = false;
+      setState(() {});
     } else {
       if (mounted) {
         showSnackBarMessage(context: context, message: response.errorMessage, isError: true);

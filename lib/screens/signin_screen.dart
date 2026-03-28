@@ -3,6 +3,7 @@ import 'package:task_manager_app/controller/auth_controller.dart';
 import 'package:task_manager_app/data/models/network_response.dart';
 import 'package:task_manager_app/data/models/user_model.dart';
 import 'package:task_manager_app/data/services/api_response.dart';
+import 'package:task_manager_app/screens/email_verify_screen.dart';
 import 'package:task_manager_app/screens/main_bottom_nav_screen.dart';
 import 'package:task_manager_app/screens/signup_screen.dart';
 import 'package:task_manager_app/utils/app_urls.dart';
@@ -92,7 +93,9 @@ class _SignInScreenState extends State<SignInScreen> {
                 const SizedBox(height: 24),
                 Center(
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushNamed(context, EmailVerificationScreen.name);
+                    },
                     child: Text('Forget Password ?'),
                   ),
                 ),

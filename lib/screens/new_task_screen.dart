@@ -37,74 +37,78 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(context, CreateNewTaskScreen.name);
-        },
+        onPressed: _onTap,
         child: const Icon(Icons.add),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        child: SafeArea(
-          child: Column(
-            children: [
-              Visibility(
-                visible: !_getTaskStatusCountInProgress,
-                replacement: LinearProgressIndicator(),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TaskSummaryCard(
-                        taskCount: _getStatusCount('New'),
-                        cardTitle: 'New',
-                      ),
-                    ),
-                    Expanded(
-                      child: TaskSummaryCard(
-                        taskCount: _getStatusCount('Completed'),
-                        cardTitle: 'Completed',
-                      ),
-                    ),
-                    Expanded(
-                      child: TaskSummaryCard(
-                        taskCount: _getStatusCount('Pending'),
-                        cardTitle: 'Progress',
-                      ),
-                    ),
-                    Expanded(
-                      child: TaskSummaryCard(
-                        taskCount: _getStatusCount('Canceled'),
-                        cardTitle: 'Canceled',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              Expanded(
-                child: Visibility(
-                  visible: !_newTaskInProgress,
-                  replacement: const Center(child: CircularProgressIndicator()),
-                  child: newTaskList.isEmpty
-                      ? const Center(child: Text('No task available ....!'))
-                      : ListView.builder(
-                          padding: EdgeInsets.zero,
-                          itemCount: newTaskList.length,
-                          itemBuilder: (context, index) {
-                            final task = newTaskList[index];
-
-                            return TaskCardTile(
-                              title: task.title ?? '',
-                              subTitle: task.description ?? '',
-                              status: task.status ?? '',
-                              date: 'Date: ${task.createdDate ?? ''}',
-                              onTapEdit: () {},
-                              onTapDelete: ()=> _onTapDeleteTask(task.sId ?? ''),
-                            );
-                          },
+      body: RefreshIndicator(
+        onRefresh: () async{
+          _getNetTask();
+          _getTaskStatusCount();
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          child: SafeArea(
+            child: Column(
+              children: [
+                Visibility(
+                  visible: !_getTaskStatusCountInProgress,
+                  replacement: LinearProgressIndicator(),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TaskSummaryCard(
+                          taskCount: _getStatusCount('New'),
+                          cardTitle: 'New',
                         ),
+                      ),
+                      Expanded(
+                        child: TaskSummaryCard(
+                          taskCount: _getStatusCount('Completed'),
+                          cardTitle: 'Completed',
+                        ),
+                      ),
+                      Expanded(
+                        child: TaskSummaryCard(
+                          taskCount: _getStatusCount('Pending'),
+                          cardTitle: 'Progress',
+                        ),
+                      ),
+                      Expanded(
+                        child: TaskSummaryCard(
+                          taskCount: _getStatusCount('Canceled'),
+                          cardTitle: 'Canceled',
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+
+                Expanded(
+                  child: Visibility(
+                    visible: !_newTaskInProgress,
+                    replacement: const Center(child: CircularProgressIndicator()),
+                    child: newTaskList.isEmpty
+                        ? const Center(child: Text('No task available ....!'))
+                        : ListView.builder(
+                            padding: EdgeInsets.zero,
+                            itemCount: newTaskList.length,
+                            itemBuilder: (context, index) {
+                              final task = newTaskList[index];
+
+                              return TaskCardTile(
+                                title: task.title ?? '',
+                                subTitle: task.description ?? '',
+                                status: task.status ?? '',
+                                date: 'Date: ${task.createdDate ?? ''}',
+                                onTapEdit: () {},
+                                onTapDelete: ()=> _onTapDeleteTask(task.sId ?? ''),
+                              );
+                            },
+                          ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -204,5 +208,12 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
 
     _newTaskInProgress = false;
     setState(() {});
+  }
+
+  void _onTap() async{
+    final bool? shouldRefresh = await Navigator.pushNamed(context, CreateNewTaskScreen.name);
+    if(shouldRefresh == true){
+      _getNetTask();
+    }
   }
 }

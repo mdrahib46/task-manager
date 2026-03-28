@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:task_manager_app/data/models/network_response.dart';
+import 'package:task_manager_app/data/services/api_response.dart';
+import 'package:task_manager_app/screens/pin_verify_screen.dart';
 import 'package:task_manager_app/screens/signin_screen.dart';
+import 'package:task_manager_app/utils/app_urls.dart';
 import 'package:task_manager_app/widgets/auth_prompt_text_button.dart';
 import 'package:task_manager_app/widgets/custom_app_background.dart';
 import 'package:task_manager_app/widgets/heading_text_section.dart';
+import 'package:task_manager_app/widgets/snackbar_message.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
   static const String name = '/Email-Verify';
@@ -16,6 +21,9 @@ class EmailVerificationScreen extends StatefulWidget {
 class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _emailTEController = TextEditingController();
+
+  bool _inProgress = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,9 +63,17 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                   },
                 ),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {},
-                  child: Icon(Icons.arrow_forward_ios_rounded),
+                Visibility(
+                  visible: !_inProgress,
+                  replacement: Center(child: CircularProgressIndicator(),),
+                  child: ElevatedButton(
+                    onPressed: (){
+                      if(_formKey.currentState!.validate()){
+                        _onTapNextScreen();
+                      }
+                    },
+                    child: Icon(Icons.arrow_forward_ios_rounded),
+                  ),
                 ),
                 const SizedBox(height: 32),
                 AuthPromptTextButton(
@@ -75,8 +91,43 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     );
   }
 
+  Future<void> _onTapNextScreen() async {
+    _inProgress = true;
+    setState(() {});
+
+    final NetworkResponse response = await ApiCaller.getRequest(
+      url: AppUrls.recoverVerifyEmail(email: _emailTEController.text.trim()),
+    );
+    if (response.isSuccess) {
+      if (mounted) {
+        Navigator.pushNamed(
+          context,
+          PinVerificationScreen.name,
+          arguments: _emailTEController.text.trim(),
+        );
+        _clearText();
+      }
+    }
+    else{
+      if(mounted){
+        showSnackBarMessage(
+          context: context,
+          message: response.errorMessage,
+          isError: true
+        );
+      }
+    }
+    _inProgress = false;
+    setState(() {});
+  }
+
   void _clearText() {
     _emailTEController.clear();
+  }
+
+  @override
+  void dispose() {
     super.dispose();
+    _emailTEController.dispose();
   }
 }

@@ -95,14 +95,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                             itemBuilder: (context, index) {
                               final task = newTaskList[index];
 
-                              return TaskCardTile(
-                                title: task.title ?? '',
-                                subTitle: task.description ?? '',
-                                status: task.status ?? '',
-                                date: 'Date: ${task.createdDate ?? ''}',
-                                onTapEdit: () {},
-                                onTapDelete: ()=> _onTapDeleteTask(task.sId ?? ''),
-                              );
+                              return TaskCardTile(taskModel: task, onRefreshList: _getNetTask);
                             },
                           ),
                   ),
@@ -178,37 +171,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
     setState(() {});
   }
 
-  Future<void> _onTapDeleteTask(String id) async {
-    _newTaskInProgress = true;
-    setState(() {});
 
-    final NetworkResponse response = await ApiCaller.getRequest(
-      url: AppUrls.deleteTask(id: id),
-    );
-
-
-    if (response.isSuccess) {
-      await _getNetTask();
-      await _getTaskStatusCount();
-      if (mounted) {
-        showSnackBarMessage(
-          context: context,
-          message: 'Task has been deleted....!',
-        );
-      }
-    } else {
-      if (mounted) {
-        showSnackBarMessage(
-          context: context,
-          message: response.errorMessage,
-          isError: true,
-        );
-      }
-    }
-
-    _newTaskInProgress = false;
-    setState(() {});
-  }
 
   void _onTap() async{
     final bool? shouldRefresh = await Navigator.pushNamed(context, CreateNewTaskScreen.name);

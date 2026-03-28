@@ -38,14 +38,7 @@ class _CanceledTaskScreenState extends State<CanceledTaskScreen> {
               itemCount: canceledTaskList.length,
               itemBuilder: (context, index) {
                 final task = canceledTaskList[index];
-                return TaskCardTile(
-                  title: task.title ?? '',
-                  subTitle: task.description ?? '',
-                  status: task.status ?? '',
-                  date: 'Date: ${task.createdDate ?? ''}',
-                  onTapEdit: () {},
-                  onTapDelete: (){},
-                );
+                return TaskCardTile(taskModel: task, onRefreshList: _fetchCanceledTask);
               },
             ),
           ),

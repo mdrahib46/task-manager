@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:task_manager_app/widgets/TMAppBar.dart';
 import 'package:task_manager_app/widgets/custom_app_background.dart';
+import 'package:task_manager_app/widgets/snackbar_message.dart';
 
 class UpdateProfileScreen extends StatefulWidget {
   static const String name = '/Profile-Screen';
@@ -40,14 +41,16 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         setState(() {});
       }
     } catch (e) {
-      print("Error Picking Image");
+      if(mounted){
+        showSnackBarMessage(context: context, message: "Error picking image");
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: TMAppBar(),
+      appBar: TMAppBar(isProfileOpen: true,),
       body: CustomAppBackground(
         child: Padding(
           padding: const EdgeInsets.all(20.0),

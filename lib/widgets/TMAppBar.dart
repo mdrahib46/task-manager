@@ -4,17 +4,22 @@ import 'package:task_manager_app/screens/signin_screen.dart';
 import 'package:task_manager_app/screens/update_profile_screen.dart';
 
 class TMAppBar extends StatelessWidget implements PreferredSizeWidget {
-  TMAppBar({super.key});
+  TMAppBar({super.key, this.isProfileOpen = false});
 
-  final String? _uerName =
+  final String _uerName =
       '${AuthController.userModel!.firstName} ${AuthController.userModel!.lastName}';
-  final String? _email = '${AuthController.userModel!.email}';
-  final String? _profilePhoto = "${AuthController.userModel!.photo}";
+  final String _email = '${AuthController.userModel!.email}';
+  final String _profilePhoto = "${AuthController.userModel!.photo}";
+
+  final bool isProfileOpen;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
+        if(isProfileOpen){
+          return;
+        }
         Navigator.pushNamed(context, UpdateProfileScreen.name);
       },
       child: AppBar(
@@ -25,7 +30,7 @@ class TMAppBar extends StatelessWidget implements PreferredSizeWidget {
             CircleAvatar(
               backgroundColor: Colors.white,
               backgroundImage:
-                  (_profilePhoto != null && _profilePhoto.isNotEmpty)
+                  (_profilePhoto.isNotEmpty)
                   ? NetworkImage(_profilePhoto)
                   : AssetImage('assets/images/avatar.jpg') as ImageProvider,
               radius: 16,
@@ -36,7 +41,7 @@ class TMAppBar extends StatelessWidget implements PreferredSizeWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _uerName!,
+                    _uerName,
                     style: const TextStyle(
                       fontSize: 14,
                       color: Colors.white,
@@ -44,7 +49,7 @@ class TMAppBar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                   ),
                   Text(
-                    _email!,
+                    _email,
                     style: TextStyle(fontSize: 14, color: Colors.white),
                   ),
                 ],

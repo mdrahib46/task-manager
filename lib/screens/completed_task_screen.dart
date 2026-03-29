@@ -19,31 +19,32 @@ class _CompletedTaskScreenState extends State<CompletedTaskScreen> {
   List<TaskModel> _completeTaskList = [];
 
   @override
-  void initState() {
-    _fetchCompleteTask();
-    // TODO: implement initState
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          child: Visibility(
-            visible:  !_inProgress,
-            replacement: Center(child: CircularProgressIndicator(),),
-            child: _completeTaskList.isEmpty ? Center(child: Text('No data available...!'),) :  ListView.builder(
-              padding: EdgeInsets.zero,
-              itemCount: _completeTaskList.length,
-              itemBuilder: (context, index) {
-                final task = _completeTaskList[index];
-                return TaskCardTile(chipColor: Colors.green.shade700,  taskModel: task, onRefreshList: _fetchCompleteTask);
-              },
-            ),
-          ),
-        ),
+        child: _completeTaskList.isEmpty
+            ? Center(child: Text('No task available.....!'))
+            : Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: Visibility(
+                  visible: !_inProgress,
+                  replacement: Center(child: CircularProgressIndicator()),
+                  child: _completeTaskList.isEmpty
+                      ? Center(child: Text('No data available...!'))
+                      : ListView.builder(
+                          padding: EdgeInsets.zero,
+                          itemCount: _completeTaskList.length,
+                          itemBuilder: (context, index) {
+                            final task = _completeTaskList[index];
+                            return TaskCardTile(
+                              chipColor: Colors.green.shade700,
+                              taskModel: task,
+                              onRefreshList: _fetchCompleteTask,
+                            );
+                          },
+                        ),
+                ),
+              ),
       ),
     );
   }
@@ -56,7 +57,6 @@ class _CompletedTaskScreenState extends State<CompletedTaskScreen> {
       url: AppUrls.getCompletedTask,
     );
 
-
     if (response.isSuccess) {
       final TaskListModel taskListModel = TaskListModel.fromJson(
         response.responseData,
@@ -66,7 +66,11 @@ class _CompletedTaskScreenState extends State<CompletedTaskScreen> {
       setState(() {});
     } else {
       if (mounted) {
-        showSnackBarMessage(context: context, message: response.errorMessage, isError: true);
+        showSnackBarMessage(
+          context: context,
+          message: response.errorMessage,
+          isError: true,
+        );
       }
     }
   }

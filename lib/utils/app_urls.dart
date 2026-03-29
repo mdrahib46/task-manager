@@ -3,10 +3,10 @@
 class AppUrls {
   AppUrls._();
 
-  static const String _baseUrl = 'https://task.teamrabbil.com/api/v1';
+  static const String _baseUrl = 'http://35.73.30.144:2005/api/v1';
 
-  static const String registration = '$_baseUrl/registration';
-  static const String login = '$_baseUrl/login';
+  static const String registration = '$_baseUrl/Registration';
+  static const String login = '$_baseUrl/Login';
   static const String getNewTask = '$_baseUrl/listTaskByStatus/New';
   static const String getCompletedTask = '$_baseUrl/listTaskByStatus/Completed';
   static const String getCanceledTask = '$_baseUrl/listTaskByStatus/Canceled';
@@ -18,5 +18,5 @@ class AppUrls {
   static String updateTaskByStatus({required String id, required String status}) => '$_baseUrl/updateTaskStatus/$id/$status';
 
 
-  // static const String
+
 }

@@ -38,7 +38,7 @@ class _CanceledTaskScreenState extends State<CanceledTaskScreen> {
               itemCount: canceledTaskList.length,
               itemBuilder: (context, index) {
                 final task = canceledTaskList[index];
-                return TaskCardTile(taskModel: task, onRefreshList: _fetchCanceledTask);
+                return TaskCardTile(chipColor: Colors.redAccent.shade700, taskModel: task, onRefreshList: _fetchCanceledTask);
               },
             ),
           ),

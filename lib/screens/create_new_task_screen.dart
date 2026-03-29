@@ -86,13 +86,13 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
     _inProgress = false;
     setState(() {});
     if (response.isSuccess) {
-
       if (mounted) {
         _clearText();
         showSnackBarMessage(
           context: context,
           message: 'New task has been created....!',
         );
+        Navigator.pop(context , true);
       }
     } else {
       if (mounted) {

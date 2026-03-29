@@ -39,7 +39,7 @@ class _CompletedTaskScreenState extends State<CompletedTaskScreen> {
               itemCount: _completeTaskList.length,
               itemBuilder: (context, index) {
                 final task = _completeTaskList[index];
-                return TaskCardTile(taskModel: task, onRefreshList: _fetchCompleteTask);
+                return TaskCardTile(chipColor: Colors.green.shade700,  taskModel: task, onRefreshList: _fetchCompleteTask);
               },
             ),
           ),

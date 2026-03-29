@@ -29,7 +29,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
   @override
   void initState() {
     super.initState();
-    _getNetTask();
+    _getNewTask();
     _getTaskStatusCount();
   }
 
@@ -42,7 +42,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
       ),
       body: RefreshIndicator(
         onRefresh: () async{
-          _getNetTask();
+          _getNewTask();
           _getTaskStatusCount();
         },
         child: Padding(
@@ -69,7 +69,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                       ),
                       Expanded(
                         child: TaskSummaryCard(
-                          taskCount: _getStatusCount('Pending'),
+                          taskCount: _getStatusCount('Progress'),
                           cardTitle: 'Progress',
                         ),
                       ),
@@ -95,7 +95,10 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                             itemBuilder: (context, index) {
                               final task = newTaskList[index];
 
-                              return TaskCardTile(taskModel: task, onRefreshList: _getNetTask);
+                              return TaskCardTile(taskModel: task, onRefreshList: (){
+                                _getNewTask();
+                                _getTaskStatusCount();
+                              });
                             },
                           ),
                   ),
@@ -143,7 +146,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
     }
   }
 
-  Future<void> _getNetTask() async {
+  Future<void> _getNewTask() async {
     _newTaskInProgress = true;
     setState(() {});
 
@@ -174,9 +177,10 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
 
 
   void _onTap() async{
-    final bool? shouldRefresh = await Navigator.pushNamed(context, CreateNewTaskScreen.name);
+    final shouldRefresh = await Navigator.pushNamed(context, CreateNewTaskScreen.name);
     if(shouldRefresh == true){
-      _getNetTask();
+      _getNewTask();
+      _getTaskStatusCount();
     }
   }
 }

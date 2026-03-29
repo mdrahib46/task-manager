@@ -39,7 +39,11 @@ class _InProgressTaskScreenState extends State<InProgressTaskScreen> {
               itemCount: _pendingTaskList.length,
               itemBuilder: (context, index) {
                 final task = _pendingTaskList[index];
-                return TaskCardTile(taskModel: task, onRefreshList: _getPendingTask);
+                return TaskCardTile(
+                  chipColor: Colors.purpleAccent.shade700,
+                  taskModel: task,
+                  onRefreshList: _getPendingTask,
+                );
               },
             ),
           ),

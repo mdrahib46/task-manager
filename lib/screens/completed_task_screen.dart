@@ -19,32 +19,36 @@ class _CompletedTaskScreenState extends State<CompletedTaskScreen> {
   List<TaskModel> _completeTaskList = [];
 
   @override
+  void initState() {
+    _fetchCompleteTask();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: _completeTaskList.isEmpty
-            ? Center(child: Text('No task available.....!'))
-            : Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                child: Visibility(
-                  visible: !_inProgress,
-                  replacement: Center(child: CircularProgressIndicator()),
-                  child: _completeTaskList.isEmpty
-                      ? Center(child: Text('No data available...!'))
-                      : ListView.builder(
-                          padding: EdgeInsets.zero,
-                          itemCount: _completeTaskList.length,
-                          itemBuilder: (context, index) {
-                            final task = _completeTaskList[index];
-                            return TaskCardTile(
-                              chipColor: Colors.green.shade700,
-                              taskModel: task,
-                              onRefreshList: _fetchCompleteTask,
-                            );
-                          },
-                        ),
-                ),
-              ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          child: Visibility(
+            visible: !_inProgress,
+            replacement: Center(child: CircularProgressIndicator()),
+            child: _completeTaskList.isEmpty
+                ? Center(child: Text('No task available.....!'))
+                : ListView.builder(
+                    padding: EdgeInsets.zero,
+                    itemCount: _completeTaskList.length,
+                    itemBuilder: (context, index) {
+                      final task = _completeTaskList[index];
+                      return TaskCardTile(
+                        chipColor: Colors.green.shade700,
+                        taskModel: task,
+                        onRefreshList: _fetchCompleteTask,
+                      );
+                    },
+                  ),
+          ),
+        ),
       ),
     );
   }

@@ -12,9 +12,6 @@ class TaskCardTile extends StatefulWidget {
     required this.taskModel,
     required this.onRefreshList,  this.chipColor = Colors.blue,
   });
-  // final String title, subTitle, status;
-  // final String date;
-  // final VoidCallback onTapEdit, onTapDelete;
 
   final TaskModel taskModel;
   final VoidCallback onRefreshList;
@@ -27,6 +24,7 @@ class TaskCardTile extends StatefulWidget {
 class _TaskCardTileState extends State<TaskCardTile> {
   bool _deleteInProgress = false;
   bool _updateInProgress = false;
+
 
   @override
   Widget build(BuildContext context) {

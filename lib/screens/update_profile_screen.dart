@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:task_manager_app/controller/auth_controller.dart';
 import 'package:task_manager_app/widgets/TMAppBar.dart';
 import 'package:task_manager_app/widgets/custom_app_background.dart';
 import 'package:task_manager_app/widgets/snackbar_message.dart';
@@ -21,36 +22,26 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   XFile? _selectedImage;
+  bool inProgress = false;
 
-
-  String _getSelectedPhotoTitle() {
-    if (_selectedImage != null) {
-      return _selectedImage!.name;
-    }
-    return 'Select photo';
+  @override
+  void initState() {
+    _setUserData();
+    super.initState();
   }
 
-  Future<void> _pickImage() async {
-    try {
-      ImagePicker imagePicker = ImagePicker();
-      XFile? pickedImage = await imagePicker.pickImage(
-        source: ImageSource.gallery,
-      );
-      if (pickedImage != null) {
-        _selectedImage = pickedImage;
-        setState(() {});
-      }
-    } catch (e) {
-      if(mounted){
-        showSnackBarMessage(context: context, message: "Error picking image");
-      }
-    }
+  void _setUserData() {
+    _emailTEController.text = AuthController.userModel?.email ?? '';
+    _firstNameTEController.text = AuthController.userModel?.firstName ?? '';
+    _lastNameTEController.text = AuthController.userModel?.lastName ?? '';
+    _mobileTEController.text = AuthController.userModel?.mobile ?? '';
   }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: TMAppBar(isProfileOpen: true,),
+      appBar: TMAppBar(isProfileOpen: true),
       body: CustomAppBackground(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -71,6 +62,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                 const SizedBox(height: 10),
                 TextFormField(
                   controller: _emailTEController,
+                  enabled: false,
                   decoration: InputDecoration(hintText: 'Email'),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
@@ -141,7 +133,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: (){},
                   child: Icon(Icons.arrow_forward_ios_rounded),
                 ),
               ],
@@ -191,8 +183,31 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     );
   }
 
+  String _getSelectedPhotoTitle() {
+    if (_selectedImage != null) {
+      return _selectedImage!.name;
+    }
+    return 'Select photo';
+  }
 
-  void _clearText(){
+  Future<void> _pickImage() async {
+    try {
+      ImagePicker imagePicker = ImagePicker();
+      XFile? pickedImage = await imagePicker.pickImage(
+        source: ImageSource.gallery,
+      );
+      if (pickedImage != null) {
+        _selectedImage = pickedImage;
+        setState(() {});
+      }
+    } catch (e) {
+      if (mounted) {
+        showSnackBarMessage(context: context, message: "Error picking image");
+      }
+    }
+  }
+
+  void _clearText() {
     _emailTEController.clear();
     _firstNameTEController.clear();
     _lastNameTEController.clear();

@@ -27,13 +27,31 @@ class TMAppBar extends StatelessWidget implements PreferredSizeWidget {
         backgroundColor: Colors.green,
         title: Row(
           children: [
+            // CircleAvatar(
+            //   backgroundColor: Colors.white,
+            //   backgroundImage:
+            //       (_profilePhoto.isNotEmpty)
+            //       ? NetworkImage(_profilePhoto)
+            //       : AssetImage('assets/images/avatar.jpg'),
+            //   radius: 16,
+            // ),
+
             CircleAvatar(
-              backgroundColor: Colors.white,
-              backgroundImage:
-                  (_profilePhoto.isNotEmpty)
-                  ? NetworkImage(_profilePhoto)
-                  : AssetImage('assets/images/avatar.jpg') as ImageProvider,
               radius: 16,
+              backgroundColor: Colors.white,
+              child: ClipOval(
+                child: (_profilePhoto.isNotEmpty)
+                    ? Image.network(
+                  _profilePhoto,
+                  fit: BoxFit.cover,
+                  width: 32,
+                  height: 32,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.asset('assets/images/avatar.jpg');
+                  },
+                )
+                    : Image.asset('assets/images/avatar.jpg'),
+              ),
             ),
             const SizedBox(width: 10),
             Expanded(

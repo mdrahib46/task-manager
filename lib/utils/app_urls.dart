@@ -16,6 +16,8 @@ class AppUrls {
   static String deleteTask({required String id}) => '$_baseUrl/deleteTask/$id';
   static String recoverVerifyEmail({required String email}) => '$_baseUrl/RecoverVerifyEmail/$email';
   static String updateTaskByStatus({required String id, required String status}) => '$_baseUrl/updateTaskStatus/$id/$status';
+  static const String updateProfile = '$_baseUrl/ProfileUpdate';
+
 
 
 

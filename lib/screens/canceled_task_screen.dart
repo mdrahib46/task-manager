@@ -28,14 +28,14 @@ class _CanceledTaskScreenState extends State<CanceledTaskScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: canceledTaskList.isEmpty
-            ? Center(child: Text('No task available.....!'))
-            : Padding(
+        child:Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 child: Visibility(
                   visible: !_inProgress,
                   replacement: Center(child: CircularProgressIndicator()),
-                  child: ListView.builder(
+                  child: canceledTaskList.isEmpty
+                      ? Center(child: Text('No task available.....!'))
+                      :  ListView.builder(
                     padding: EdgeInsets.zero,
                     itemCount: canceledTaskList.length,
                     itemBuilder: (context, index) {

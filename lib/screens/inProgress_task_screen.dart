@@ -29,12 +29,12 @@ class _InProgressTaskScreenState extends State<InProgressTaskScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: _pendingTaskList.isEmpty ? Center(child: Text('No task available.....!'),) : Padding(
+        child:  Padding(
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           child: Visibility(
             visible: !_inProgress,
             replacement: Center(child: CircularProgressIndicator()),
-            child: ListView.builder(
+            child: _pendingTaskList.isEmpty ? Center(child: Text('No task available.....!'),) : ListView.builder(
               padding: EdgeInsets.zero,
               itemCount: _pendingTaskList.length,
               itemBuilder: (context, index) {

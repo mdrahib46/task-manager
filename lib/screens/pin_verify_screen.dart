@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:task_manager_app/data/models/network_response.dart';
+import 'package:task_manager_app/data/services/api_response.dart';
+import 'package:task_manager_app/screens/set_password_screen.dart';
 import 'package:task_manager_app/screens/signin_screen.dart';
+import 'package:task_manager_app/utils/app_urls.dart';
 import 'package:task_manager_app/widgets/auth_prompt_text_button.dart';
 import 'package:task_manager_app/widgets/custom_app_background.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:task_manager_app/widgets/heading_text_section.dart';
+import 'package:task_manager_app/widgets/snackbar_message.dart';
 
 class PinVerificationScreen extends StatefulWidget {
   static const String name = '/Pin-Verify';
@@ -17,6 +22,8 @@ class PinVerificationScreen extends StatefulWidget {
 
 class _PinVerificationScreenState extends State<PinVerificationScreen> {
   final PinInputController _pinCodeController = PinInputController();
+
+  bool _inProgress = false;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +43,10 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
               const SizedBox(height: 16),
               _buildPinCodeInput(),
               const SizedBox(height: 20),
-              ElevatedButton(onPressed: () {}, child: Text('Verify')),
+              Visibility(
+                  visible: !_inProgress,
+                  replacement: Center(child: CircularProgressIndicator(),),
+                  child: ElevatedButton(onPressed: verifyOtp, child: Text('Verify'))),
               const SizedBox(height: 40),
               AuthPromptTextButton(
                 promptText: 'Have account? ',
@@ -89,8 +99,44 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
     );
   }
 
-  void _clearText() {
-    _pinCodeController.clear();
-    super.dispose();
+  Future<void> verifyOtp() async {
+    _inProgress = true;
+    setState(() {});
+
+    final NetworkResponse response = await ApiCaller.getRequest(
+      url: AppUrls.recoverVerifyOTP(
+        email: widget.email,
+        otp: _pinCodeController.text.trim(),
+      ),
+    );
+
+    if (response.isSuccess) {
+      if (mounted) {
+        showSnackBarMessage(
+          context: context,
+          message: response.responseData['data'] ?? 'Successfully verified....!',
+        );
+        Navigator.pushNamed(
+          context,
+          ResetPasswordScreen.name,
+          arguments: {
+            "email": widget.email,
+            "otp": _pinCodeController.text,
+          },
+        );
+      }
+    } else {
+      if (mounted) {
+        showSnackBarMessage(
+          context: context,
+          message: response.responseData['data'] ?? 'Invalid OTP ! Try again .....!',
+          isError: true,
+        );
+      }
+    }
+
+    _inProgress = false;
+    setState(() {});
   }
+
 }

@@ -33,8 +33,9 @@ class MyApp extends StatelessWidget {
           widget = SignInScreen();
         } else if (settings.name == SignupScreen.name) {
           widget = SignupScreen();
-        } else if (settings.name == SetPasswordScreen.name) {
-          widget = SetPasswordScreen();
+        } else if (settings.name == ResetPasswordScreen.name) {
+          final args = settings.arguments as Map<String, dynamic>;
+          widget = ResetPasswordScreen(email: args['email'], otp: args['otp']);
         } else if (settings.name == PinVerificationScreen.name) {
           String email = settings.arguments as String;
           widget = PinVerificationScreen(email: email);

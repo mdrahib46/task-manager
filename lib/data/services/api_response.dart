@@ -55,7 +55,7 @@ class ApiCaller {
         return NetworkResponse(
           isSuccess: false,
           statusCode: response.statusCode,
-          errorMessage: 'Request failed. Please try again.',
+          errorMessage: decodedResponse['data'] ?? 'Request failed. Try again.....',
           responseData: decodedResponse,
         );
       }

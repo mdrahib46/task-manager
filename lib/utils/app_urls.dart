@@ -14,9 +14,12 @@ class AppUrls {
   static const String createTask = '$_baseUrl/createTask';
   static const String taskStatusCount = '$_baseUrl/taskStatusCount';
   static String deleteTask({required String id}) => '$_baseUrl/deleteTask/$id';
-  static String recoverVerifyEmail({required String email}) => '$_baseUrl/RecoverVerifyEmail/$email';
   static String updateTaskByStatus({required String id, required String status}) => '$_baseUrl/updateTaskStatus/$id/$status';
   static const String updateProfile = '$_baseUrl/ProfileUpdate';
+  static String recoverVerifyEmail({required String email}) => '$_baseUrl/RecoverVerifyEmail/$email';
+  static String recoverVerifyOTP({required String email, required String otp}) => '$_baseUrl/RecoverVerifyOtp/$email/$otp';
+  static String resetPassword ='$_baseUrl/RecoverResetPassword';
+
 
 
 

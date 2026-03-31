@@ -100,6 +100,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     );
     if (response.isSuccess) {
       if (mounted) {
+        showSnackBarMessage(context: context, message: response.responseData['data']);
         Navigator.pushNamed(
           context,
           PinVerificationScreen.name,

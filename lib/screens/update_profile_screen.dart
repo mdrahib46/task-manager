@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:task_manager_app/controller/auth_controller.dart';
+import 'package:task_manager_app/data/models/network_response.dart';
+import 'package:task_manager_app/data/models/user_model.dart';
+import 'package:task_manager_app/data/services/api_response.dart';
+import 'package:task_manager_app/screens/main_bottom_nav_screen.dart';
+import 'package:task_manager_app/utils/app_urls.dart';
 import 'package:task_manager_app/widgets/TMAppBar.dart';
 import 'package:task_manager_app/widgets/custom_app_background.dart';
 import 'package:task_manager_app/widgets/snackbar_message.dart';
@@ -36,7 +41,6 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     _lastNameTEController.text = AuthController.userModel?.lastName ?? '';
     _mobileTEController.text = AuthController.userModel?.mobile ?? '';
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -132,9 +136,13 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                   },
                 ),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: (){},
-                  child: Icon(Icons.arrow_forward_ios_rounded),
+                Visibility(
+                  visible: !inProgress,
+                  replacement: Center(child: CircularProgressIndicator()),
+                  child: ElevatedButton(
+                    onPressed: _updateProfile,
+                    child: Icon(Icons.arrow_forward_ios_rounded),
+                  ),
                 ),
               ],
             ),
@@ -207,12 +215,75 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     }
   }
 
+  Future<void> _updateProfile() async {
+    inProgress = true;
+    setState(() {});
+
+    final Map<String, dynamic> requestBody = {
+      "email": _emailTEController.text.trim(),
+      "firstName": _firstNameTEController.text.trim(),
+      "lastName": _lastNameTEController.text.trim(),
+      "mobile": _mobileTEController.text.trim(),
+    };
+
+    if (_passwordTEController.text.isNotEmpty) {
+      requestBody['password'] = _passwordTEController.text;
+    }
+
+    final NetworkResponse response = await ApiCaller.postRequest(
+      url: AppUrls.updateProfile,
+      body: requestBody,
+    );
+
+    if (response.isSuccess) {
+      UserModel userModel = UserModel(
+        sId: AuthController.userModel!.sId,
+        email: _emailTEController.text,
+        firstName: _firstNameTEController.text,
+        lastName: _lastNameTEController.text,
+        mobile: _mobileTEController.text,
+        photo: response.responseData['photo'] ?? '',
+      );
+      AuthController.updateUserData(userModel);
+
+      if (mounted) {
+        showSnackBarMessage(
+          context: context,
+          message: 'Profile update successfully',
+        );
+
+        _clearText();
+        Navigator.pushNamedAndRemoveUntil(context, MainBottomNavScreen.name, (route)=> false);
+      }
+    } else {
+      if (mounted) {
+        showSnackBarMessage(
+          context: context,
+          message: 'Profile update failed....!',
+          isError: false,
+        );
+      }
+    }
+
+    inProgress = false;
+    setState(() {});
+  }
+
   void _clearText() {
     _emailTEController.clear();
     _firstNameTEController.clear();
     _lastNameTEController.clear();
     _mobileTEController.clear();
     _passwordTEController.clear();
+  }
+
+  @override
+  void dispose() {
     super.dispose();
+    _emailTEController.clear();
+    _firstNameTEController.clear();
+    _lastNameTEController.clear();
+    _mobileTEController.clear();
+    _passwordTEController.clear();
   }
 }

@@ -1,20 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:task_manager_app/controller/auth_controller.dart';
+import 'package:task_manager_app/provider/atuh_provider.dart';
 import 'package:task_manager_app/screens/signin_screen.dart';
 import 'package:task_manager_app/screens/update_profile_screen.dart';
 
 class TMAppBar extends StatelessWidget implements PreferredSizeWidget {
   TMAppBar({super.key, this.isProfileOpen = false});
 
-  final String _uerName =
-      '${AuthController.userModel!.firstName} ${AuthController.userModel!.lastName}';
-  final String _email = '${AuthController.userModel!.email}';
-  final String _profilePhoto = "${AuthController.userModel!.photo}";
-
   final bool isProfileOpen;
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.read<AuthProvider>();
+    final user = authProvider.userModel;
+
+
+
+    final String _usrName = user != null ? '${user.firstName} ${user.lastName}' : 'Guest User';
+    final String _email = user?.email ?? '';
+    final String _profilePhoto = user?.photo ?? '';
+
     return GestureDetector(
       onTap: () {
         if(isProfileOpen){
@@ -27,15 +33,6 @@ class TMAppBar extends StatelessWidget implements PreferredSizeWidget {
         backgroundColor: Colors.green,
         title: Row(
           children: [
-            // CircleAvatar(
-            //   backgroundColor: Colors.white,
-            //   backgroundImage:
-            //       (_profilePhoto.isNotEmpty)
-            //       ? NetworkImage(_profilePhoto)
-            //       : AssetImage('assets/images/avatar.jpg'),
-            //   radius: 16,
-            // ),
-
             CircleAvatar(
               radius: 16,
               backgroundColor: Colors.white,
@@ -59,7 +56,7 @@ class TMAppBar extends StatelessWidget implements PreferredSizeWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _uerName,
+                    _usrName,
                     style: const TextStyle(
                       fontSize: 14,
                       color: Colors.white,

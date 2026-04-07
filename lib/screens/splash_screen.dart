@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:task_manager_app/controller/auth_controller.dart';
+import 'package:provider/provider.dart';
+import 'package:task_manager_app/provider/atuh_provider.dart';
 import 'package:task_manager_app/screens/main_bottom_nav_screen.dart';
 import 'package:task_manager_app/screens/signin_screen.dart';
 import 'package:task_manager_app/utils/asset_path.dart';
@@ -15,46 +16,65 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  Future<void> _moveToNextScreen() async {
+  // Future<void> _moveToNextScreen() async {
+  //   await Future.delayed(const Duration(seconds: 3));
+  //
+  //   Navigator.pushNamedAndRemoveUntil(
+  //     context,
+  //     SignInScreen.name,
+  //     (route) => false,
+  //   );
+  //
+  //   await AuthController.getUserData();
+  //   bool result = await AuthController.isUserLoggedIn();
+  //   if (result) {
+  //     Navigator.pushNamedAndRemoveUntil(
+  //       context,
+  //       MainBottomNavScreen.name,
+  //       (route) => false,
+  //     );
+  //   } else {
+  //     Navigator.pushNamed(context, SignInScreen.name);
+  //   }
+  //
+  //   // await AuthController.getUserData();
+  //   //
+  //   // if (await AuthController.isUserLoggedIn()) {
+  //   //   if (mounted) {
+  //   //     Navigator.pushNamedAndRemoveUntil(
+  //   //       context,
+  //   //       MainBottomNavScreen.name,
+  //   //       (route) => false,
+  //   //     );
+  //   //   }
+  //   // } else {
+  //   //   if (mounted) {
+  //   //     Navigator.pushNamedAndRemoveUntil(
+  //   //       context,
+  //   //       SignInScreen.name,
+  //   //       (route) => false,
+  //   //     );
+  //   //   }
+  //   // }
+  // }
+
+  Future<void> _moveToNextScreen() async{
     await Future.delayed(const Duration(seconds: 3));
 
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      SignInScreen.name,
-      (route) => false,
-    );
+    final AuthProvider authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-    await AuthController.getUserData();
-    bool result = await AuthController.isUserLoggedIn();
-    if (result) {
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        MainBottomNavScreen.name,
-        (route) => false,
-      );
-    } else {
-      Navigator.pushNamed(context, SignInScreen.name);
+    await authProvider.loadUser();
+
+    if(authProvider.isLoggedIn){
+      if(mounted){
+        Navigator.pushNamedAndRemoveUntil(context, MainBottomNavScreen.name, (route)=> false);
+      }
+    }else{
+      if(mounted){
+        Navigator.pushNamedAndRemoveUntil(context, SignInScreen.name, (route)=> false);
+      }
     }
 
-    // await AuthController.getUserData();
-    //
-    // if (await AuthController.isUserLoggedIn()) {
-    //   if (mounted) {
-    //     Navigator.pushNamedAndRemoveUntil(
-    //       context,
-    //       MainBottomNavScreen.name,
-    //       (route) => false,
-    //     );
-    //   }
-    // } else {
-    //   if (mounted) {
-    //     Navigator.pushNamedAndRemoveUntil(
-    //       context,
-    //       SignInScreen.name,
-    //       (route) => false,
-    //     );
-    //   }
-    // }
   }
 
   @override

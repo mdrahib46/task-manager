@@ -10,7 +10,7 @@ class ApiCaller {
 
   ApiCaller._();
 
-  static Future<NetworkResponse> getRequest({required String url}) async {
+  static Future<NetworkResponse> getRequest({required String url, String? accessToken}) async {
     try {
       Uri uri = Uri.parse(url);
 
@@ -20,8 +20,8 @@ class ApiCaller {
         "Content-Type": "application/json",
       };
 
-      if (AuthController.accessToken != null) {
-        headers['token'] = AuthController.accessToken!;
+      if (accessToken != null) {
+        headers['token'] = accessToken;
       }
 
       http.Response response = await http.get(uri, headers: headers);

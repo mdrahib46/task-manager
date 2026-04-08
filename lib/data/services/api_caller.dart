@@ -8,6 +8,7 @@ import 'package:task_manager_app/data/models/network_response.dart';
 class ApiCaller {
   static final Logger _logger = Logger();
 
+
   ApiCaller._();
 
   static Future<NetworkResponse> getRequest({required String url, String? accessToken}) async {

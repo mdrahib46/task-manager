@@ -35,7 +35,7 @@ class _CanceledTaskScreenState extends State<CanceledTaskScreen> {
             return Padding(
                     padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     child: Visibility(
-                      visible: !taskProvider.isLoading,
+                      visible: !taskProvider.isLoadingTasks,
                       replacement: Center(child: CircularProgressIndicator()),
                       child: taskProvider.canceledTask.isEmpty
                           ? Center(child: Text('No task available.....!'))

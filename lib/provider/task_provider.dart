@@ -6,6 +6,7 @@ import 'package:task_manager_app/data/models/task_model.dart';
 import 'package:task_manager_app/data/services/api_caller.dart';
 import 'package:task_manager_app/provider/atuh_provider.dart';
 import 'package:task_manager_app/utils/app_urls.dart';
+import 'package:task_manager_app/widgets/snackbar_message.dart';
 
 class TaskProvider extends ChangeNotifier {
   List<TaskModel> newTask = [];
@@ -62,19 +63,25 @@ class TaskProvider extends ChangeNotifier {
       );
 
       if (networkResponse.isSuccess) {
-        List<TaskModel> taskList = (networkResponse.responseData['data'] as List)
-            .map((json) => TaskModel.fromJson(json))
-            .toList();
+        List<TaskModel> taskList =
+            (networkResponse.responseData['data'] as List)
+                .map((json) => TaskModel.fromJson(json))
+                .toList();
 
         setListByTaskStatus(status, taskList);
       }
     } catch (e) {
+      errorMessage = e.toString();
     } finally {
       _setLoadingTasks(false);
     }
   }
 
-  Future<bool> deleteTask(BuildContext context, String taskId, String status) async {
+  Future<bool> deleteTask(
+    BuildContext context,
+    String taskId,
+    String status,
+  ) async {
     _setLoadingTasks(true);
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -114,29 +121,80 @@ class TaskProvider extends ChangeNotifier {
   Future<void> fetchAllTaskCounts(BuildContext context) async {
     _setLoadingCounts(true);
 
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final NetworkResponse response = await ApiCaller.getRequest(
+      url: AppUrls.taskStatusCount,
+      accessToken: authProvider.accessToken,
+    );
+
+    if (response.isSuccess) {
+      final List<dynamic> dataList = response.responseData['data'] ?? [];
+      List<TaskCountModel> taskCounts = dataList
+          .map((json) => TaskCountModel.fromJson(json))
+          .toList();
+
+      _taskCountMap.clear();
+      for (var tc in taskCounts) {
+        if (tc.sId != null) _taskCountMap[tc.sId!] = tc.sum ?? 0;
+      }
+      _setLoadingCounts(false);
+      notifyListeners();
+    } else {
+      errorMessage = response.errorMessage;
+      _setLoadingCounts(false);
+      notifyListeners();
+    }
+
+    _setLoadingCounts(false);
+    notifyListeners();
+  }
+
+  Future<void> createNewTask({
+    required BuildContext context,
+    required String title,
+    required String description,
+  }) async {
+    _setLoadingTasks(true);
+
+    try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final NetworkResponse response = await ApiCaller.getRequest(
-        url: AppUrls.taskStatusCount,
+
+      final Map<String, dynamic> requestBody = {
+        "title": title,
+        "description": description,
+        "status": "New",
+      };
+
+      final NetworkResponse response = await ApiCaller.postRequest(
+        url: AppUrls.createTask,
+        body: requestBody,
         accessToken: authProvider.accessToken,
       );
 
       if (response.isSuccess) {
-        final List<dynamic> dataList = response.responseData['data'] ?? [];
-        List<TaskCountModel> taskCounts =
-        dataList.map((json) => TaskCountModel.fromJson(json)).toList();
+        showSnackBarMessage(
+          context: context,
+          message: 'New Task has been added....!',
+        );
 
-        _taskCountMap.clear();
-        for (var tc in taskCounts) {
-          if (tc.sId != null) _taskCountMap[tc.sId!] = tc.sum ?? 0;
-        }
-        _setLoadingCounts(false);
-        notifyListeners();
+        await fetchTaskByStatus(context, 'New');
+
+        Navigator.pop(context);
       } else {
-        errorMessage = response.errorMessage;
-        notifyListeners();
+        showSnackBarMessage(
+          context: context,
+          message: response.responseData?['data'] ?? 'Something went wrong',
+          isError: true,
+        );
       }
+    } catch (e) {
+      showSnackBarMessage(
+        context: context,
+        message: 'An error occurred. Please try again.',
+        isError: true,
+      );
+    }
 
-      _setLoadingCounts(false);
-      notifyListeners();
+    _setLoadingTasks(false);
   }
 }

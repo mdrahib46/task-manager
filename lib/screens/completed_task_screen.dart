@@ -53,7 +53,7 @@ class _CompletedTaskScreenState extends State<CompletedTaskScreen> {
                 return TaskCardTile(
                   chipColor: Colors.green.shade700,
                   taskModel: task,
-                  onRefreshList: _refreshTaskList, // Corrected here
+                  onRefreshList: _refreshTaskList,
                 );
               },
             );

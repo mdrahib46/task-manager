@@ -233,6 +233,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     final NetworkResponse response = await ApiCaller.postRequest(
       url: AppUrls.updateProfile,
       body: requestBody,
+      accessToken: ''
     );
 
     if (response.isSuccess) {

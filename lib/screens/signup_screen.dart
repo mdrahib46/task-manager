@@ -183,6 +183,7 @@ class _SignupScreenState extends State<SignupScreen> {
     NetworkResponse response = await ApiCaller.postRequest(
       url: AppUrls.registration,
       body: requestBody,
+      accessToken: ''
     );
 
     _inProgress = false;

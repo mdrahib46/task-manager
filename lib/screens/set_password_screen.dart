@@ -95,6 +95,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     final NetworkResponse response = await ApiCaller.postRequest(
       url: AppUrls.resetPassword,
       body: requestBody,
+      accessToken: ''
     );
 
     if (response.isSuccess) {

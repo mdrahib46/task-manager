@@ -19,11 +19,11 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
+    Future.microtask(() async {
       if (mounted) {
         final provider = Provider.of<TaskProvider>(context, listen: false);
-        provider.fetchTaskByStatus(context, "New");
-        provider.fetchAllTaskCounts(context);
+        await provider.fetchTaskByStatus(context, "New");
+        await provider.fetchAllTaskCounts(context);
       }
     });
   }
@@ -51,59 +51,73 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                     Row(
                       children: [
                         Expanded(
-                          child: taskProvider.isLoadingCounts
+                          child: taskProvider.isLoading
                               ? const LinearProgressIndicator()
                               : TaskSummaryCard(
-                            taskCount: taskProvider.getTaskCount('New').toString(),
-                            cardTitle: 'New',
-                          ),
+                                  taskCount: taskProvider
+                                      .getTaskCount('New')
+                                      .toString(),
+                                  cardTitle: 'New',
+                                ),
                         ),
                         Expanded(
-                          child: taskProvider.isLoadingCounts
+                          child: taskProvider.isLoading
                               ? const LinearProgressIndicator()
                               : TaskSummaryCard(
-                            taskCount: taskProvider.getTaskCount('Completed').toString(),
-                            cardTitle: 'Completed',
-                          ),
+                                  taskCount: taskProvider
+                                      .getTaskCount('Completed')
+                                      .toString(),
+                                  cardTitle: 'Completed',
+                                ),
                         ),
                         Expanded(
-                          child: taskProvider.isLoadingCounts
+                          child: taskProvider.isLoading
                               ? const LinearProgressIndicator()
                               : TaskSummaryCard(
-                            taskCount: taskProvider.getTaskCount('Progress').toString(),
-                            cardTitle: 'Progress',
-                          ),
+                                  taskCount: taskProvider
+                                      .getTaskCount('Progress')
+                                      .toString(),
+                                  cardTitle: 'Progress',
+                                ),
                         ),
                         Expanded(
-                          child: taskProvider.isLoadingCounts
+                          child: taskProvider.isLoading
                               ? const LinearProgressIndicator()
                               : TaskSummaryCard(
-                            taskCount: taskProvider.getTaskCount('Canceled').toString(),
-                            cardTitle: 'Canceled',
-                          ),
+                                  taskCount: taskProvider
+                                      .getTaskCount('Canceled')
+                                      .toString(),
+                                  cardTitle: 'Canceled',
+                                ),
                         ),
                       ],
                     ),
 
                     // Task list
                     Expanded(
-                      child: taskProvider.isLoadingTasks
+                      child: taskProvider.isLoading
                           ? const Center(child: CircularProgressIndicator())
                           : taskProvider.newTask.isEmpty
                           ? const Center(child: Text('No task available ....!'))
                           : ListView.builder(
-                        padding: EdgeInsets.zero,
-                        itemCount: taskProvider.newTask.length,
-                        itemBuilder: (context, index) {
-                          final task = taskProvider.newTask[index];
-                          return TaskCardTile(
-                            taskModel: task,
-                            onRefreshList: () {
-                              taskProvider.fetchTaskByStatus(context, 'New');
-                            },
-                          );
-                        },
-                      ),
+                              padding: EdgeInsets.zero,
+                              itemCount: taskProvider.newTask.length,
+                              itemBuilder: (context, index) {
+                                final task = taskProvider.newTask[index];
+                                return TaskCardTile(
+                                  taskModel: task,
+                                  onRefreshList: () async {
+                                    await taskProvider.fetchTaskByStatus(
+                                      context,
+                                      'New',
+                                    );
+                                    await taskProvider.fetchAllTaskCounts(
+                                      context,
+                                    );
+                                  },
+                                );
+                              },
+                            ),
                     ),
                   ],
                 ),
@@ -120,10 +134,10 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
       context,
       CreateNewTaskScreen.name,
     );
-    if (shouldRefresh == true && mounted) {
+    if (shouldRefresh == true && mounted)  {
       final taskProvider = Provider.of<TaskProvider>(context, listen: false);
-      taskProvider.fetchTaskByStatus(context, "New");
-      taskProvider.fetchAllTaskCounts(context);
+      await taskProvider.fetchTaskByStatus(context, "New");
+      await taskProvider.fetchAllTaskCounts(context);
     }
   }
 }

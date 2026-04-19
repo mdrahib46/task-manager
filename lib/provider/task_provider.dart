@@ -19,19 +19,11 @@ class TaskProvider extends ChangeNotifier {
   final Map<String, int> _taskCountMap = {};
   int getTaskCount(String status) => _taskCountMap[status] ?? 0;
 
-  bool _isLoadingTasks = false;
-  bool get isLoadingTasks => _isLoadingTasks;
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
 
-  bool _isLoadingCounts = false;
-  bool get isLoadingCounts => _isLoadingCounts;
-
-  void _setLoadingTasks(bool value) {
-    _isLoadingTasks = value;
-    notifyListeners();
-  }
-
-  void _setLoadingCounts(bool value) {
-    _isLoadingCounts = value;
+  void _setLoading(bool value) {
+    _isLoading = value;
     notifyListeners();
   }
 
@@ -54,7 +46,7 @@ class TaskProvider extends ChangeNotifier {
   }
 
   Future<void> fetchTaskByStatus(BuildContext context, String status) async {
-    _setLoadingTasks(true);
+    _setLoading(true);
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final NetworkResponse networkResponse = await ApiCaller.getRequest(
@@ -73,80 +65,50 @@ class TaskProvider extends ChangeNotifier {
     } catch (e) {
       errorMessage = e.toString();
     } finally {
-      _setLoadingTasks(false);
+      _setLoading(false);
     }
   }
 
-  Future<bool> deleteTask(
-    BuildContext context,
-    String taskId,
-    String status,
-  ) async {
-    _setLoadingTasks(true);
+
+
+  Future<void> fetchAllTaskCounts(BuildContext context) async {
+    _setLoading(true);
+
     try {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final authProvider = Provider.of<AuthProvider>(
+        context,
+        listen: false,
+      );
+
       final NetworkResponse response = await ApiCaller.getRequest(
-        url: AppUrls.deleteTask(id: taskId),
+        url: AppUrls.taskStatusCount,
         accessToken: authProvider.accessToken,
       );
 
       if (response.isSuccess) {
-        switch (status) {
-          case "New":
-            newTask.removeWhere((task) => task.sId == taskId);
-            break;
-          case "Progress":
-            progressTask.removeWhere((task) => task.sId == taskId);
-            break;
-          case "Completed":
-            completeTask.removeWhere((task) => task.sId == taskId);
-            break;
-          case "Canceled":
-            canceledTask.removeWhere((task) => task.sId == taskId);
-            break;
+        final List<dynamic> dataList =
+            response.responseData['data'] ?? [];
+
+        List<TaskCountModel> taskCounts = dataList
+            .map((json) => TaskCountModel.fromJson(json))
+            .toList();
+
+        _taskCountMap.clear();
+
+        for (var tc in taskCounts) {
+          if (tc.sId != null) {
+            _taskCountMap[tc.sId!] = tc.sum ?? 0;
+          }
         }
-
-        await fetchAllTaskCounts(context);
-        notifyListeners();
+      } else {
+        errorMessage = response.errorMessage;
       }
-
-      return response.isSuccess;
     } catch (e) {
-      return false;
+      errorMessage = e.toString();
     } finally {
-      _setLoadingTasks(false);
-    }
-  }
-
-  Future<void> fetchAllTaskCounts(BuildContext context) async {
-    _setLoadingCounts(true);
-
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final NetworkResponse response = await ApiCaller.getRequest(
-      url: AppUrls.taskStatusCount,
-      accessToken: authProvider.accessToken,
-    );
-
-    if (response.isSuccess) {
-      final List<dynamic> dataList = response.responseData['data'] ?? [];
-      List<TaskCountModel> taskCounts = dataList
-          .map((json) => TaskCountModel.fromJson(json))
-          .toList();
-
-      _taskCountMap.clear();
-      for (var tc in taskCounts) {
-        if (tc.sId != null) _taskCountMap[tc.sId!] = tc.sum ?? 0;
-      }
-      _setLoadingCounts(false);
-      notifyListeners();
-    } else {
-      errorMessage = response.errorMessage;
-      _setLoadingCounts(false);
+      _setLoading(false);
       notifyListeners();
     }
-
-    _setLoadingCounts(false);
-    notifyListeners();
   }
 
   Future<void> createNewTask({
@@ -154,7 +116,7 @@ class TaskProvider extends ChangeNotifier {
     required String title,
     required String description,
   }) async {
-    _setLoadingTasks(true);
+    _setLoading(true);
 
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -195,6 +157,82 @@ class TaskProvider extends ChangeNotifier {
       );
     }
 
-    _setLoadingTasks(false);
+    _setLoading(false);
   }
+
+  /// Update Task Status
+  Future<bool> updateTask({
+    required BuildContext context,
+    required String taskId,
+    required String status,
+  }) async {
+    _setLoading(true);
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    try {
+      final NetworkResponse response = await ApiCaller.getRequest(
+        url: AppUrls.updateTaskByStatus(id: taskId, status: status),
+        accessToken: authProvider.accessToken
+      );
+      if (response.isSuccess) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<bool> deleteTask(
+      BuildContext context,
+      String taskId,
+      String status,
+      ) async {
+    _setLoading(true);
+
+    final authProvider = Provider.of<AuthProvider>(
+      context,
+      listen: false,
+    );
+
+    try {
+      final NetworkResponse response = await ApiCaller.getRequest(
+        url: AppUrls.deleteTask(id: taskId),
+        accessToken: authProvider.accessToken,
+      );
+
+      if (response.isSuccess) {
+        switch (status) {
+          case "New":
+            newTask.removeWhere((task) => task.sId == taskId);
+            break;
+          case "Progress":
+            progressTask.removeWhere((task) => task.sId == taskId);
+            break;
+          case "Completed":
+            completeTask.removeWhere((task) => task.sId == taskId);
+            break;
+          case "Canceled":
+            canceledTask.removeWhere((task) => task.sId == taskId);
+            break;
+        }
+
+        await fetchAllTaskCounts(context);
+        notifyListeners();
+
+        return true;
+      }
+
+      return false;
+    } catch (e) {
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
 }

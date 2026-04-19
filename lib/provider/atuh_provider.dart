@@ -8,16 +8,17 @@ import 'package:task_manager_app/data/services/api_caller.dart';
 import 'package:task_manager_app/utils/app_urls.dart';
 
 class AuthProvider extends ChangeNotifier {
-  // Keys for SharedPreferences
+
   final String _accessTokenKey = "token";
   final String _userModelKey = 'usr-data';
 
-  // Logger for debugging
+
   static final Logger _logger = Logger();
 
-  // Variables
+
   String? errorMessage;
   bool isLoading = false;
+
 
   String? accessToken;
   UserModel? userModel;
@@ -30,12 +31,15 @@ class AuthProvider extends ChangeNotifier {
 
     // Save token and user model to SharedPreferences
     await sharedPreferences.setString(_accessTokenKey, token);
-    await sharedPreferences.setString(_userModelKey, jsonEncode(model.toJson()));
+    await sharedPreferences.setString(
+      _userModelKey,
+      jsonEncode(model.toJson()),
+    );
 
-    // Assign to instance variables
+
     accessToken = token;
 
-    // Assign to instance userModel
+
     userModel = model;
 
     _logger.i('Token saved: $token');
@@ -49,7 +53,7 @@ class AuthProvider extends ChangeNotifier {
   /// -----------------------------
   Future<void> loadUser() async {
     final SharedPreferences sharedPreferences =
-    await SharedPreferences.getInstance();
+        await SharedPreferences.getInstance();
 
     accessToken = sharedPreferences.getString(_accessTokenKey);
     final userData = sharedPreferences.getString(_userModelKey);
@@ -74,10 +78,12 @@ class AuthProvider extends ChangeNotifier {
   Future<void> updateUserData(UserModel model) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    // Save updated user model under correct key
-    await sharedPreferences.setString(_userModelKey, jsonEncode(model.toJson()));
+    await sharedPreferences.setString(
+      _userModelKey,
+      jsonEncode(model.toJson()),
+    );
 
-    // Update instance variable
+
     userModel = model;
 
     notifyListeners();
@@ -108,10 +114,7 @@ class AuthProvider extends ChangeNotifier {
   /// Sign in user
   /// -----------------------------
   Future<bool> signIn({required String email, required String password}) async {
-    Map<String, dynamic> requestBody = {
-      "email": email,
-      "password": password
-    };
+    Map<String, dynamic> requestBody = {"email": email, "password": password};
 
     _setLoading(true);
 
@@ -128,6 +131,38 @@ class AuthProvider extends ChangeNotifier {
       userModel = model;
       await saveUserData(model, token);
 
+      return true;
+    } else {
+      errorMessage = response.responseData['data'];
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future signUp({
+    required String email,
+    required String fName,
+    required String lName,
+    required String mobile,
+    required String password,
+  }) async {
+    _setLoading(true);
+    Map<String, dynamic> requestBody = {
+      "email": email,
+      "firstName": fName,
+      "lastName": lName,
+      "mobile": mobile,
+      "password": password,
+    };
+
+    final NetworkResponse response = await ApiCaller.postRequest(
+      url: AppUrls.registration,
+      body: requestBody,
+    );
+
+    _setLoading(false);
+
+    if (response.isSuccess) {
       return true;
     } else {
       errorMessage = response.responseData['data'];

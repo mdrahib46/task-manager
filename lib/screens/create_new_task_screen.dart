@@ -54,7 +54,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                 Consumer<TaskProvider>(
                   builder: (context, taskProvider, child) {
                     return Visibility(
-                      visible: !taskProvider.isLoadingTasks,
+                      visible: !taskProvider.isLoading,
                       replacement: Center(child: CircularProgressIndicator()),
                       child: ElevatedButton(
                         onPressed: () {
@@ -63,6 +63,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                             title: _subjectTEController.text.trim(),
                             description: _descriptionTEController.text.trim(),
                           );
+                          taskProvider.fetchAllTaskCounts(context);
                           _clearText();
                         },
                         child: Icon(Icons.arrow_forward_ios_rounded),

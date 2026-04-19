@@ -12,79 +12,50 @@ class CanceledTaskScreen extends StatefulWidget {
 }
 
 class _CanceledTaskScreenState extends State<CanceledTaskScreen> {
-  // bool _inProgress = false;
-  // List<TaskModel> canceledTaskList = [];
-
+  @override
   @override
   void initState() {
-    Future.microtask((){
-      if(mounted){
-        final TaskProvider taskProvider = Provider.of<TaskProvider>(context, listen: false);
+    super.initState();
+
+    Future.microtask(() {
+      if (mounted) {
+        final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+
         taskProvider.fetchTaskByStatus(context, 'Canceled');
       }
     });
-    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child:Consumer<TaskProvider>(
+        child: Consumer<TaskProvider>(
           builder: (context, taskProvider, child) {
-            return Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    child: Visibility(
-                      visible: !taskProvider.isLoadingTasks,
-                      replacement: Center(child: CircularProgressIndicator()),
-                      child: taskProvider.canceledTask.isEmpty
-                          ? Center(child: Text('No task available.....!'))
-                          :  ListView.builder(
-                        padding: EdgeInsets.zero,
-                        itemCount: taskProvider.canceledTask.length,
-                        itemBuilder: (context, index) {
-                          final task = taskProvider.canceledTask[index];
-                          return TaskCardTile(
-                            chipColor: Colors.redAccent.shade700,
-                            taskModel: task,
-                            onRefreshList: (){},
+            final tasks = taskProvider.canceledTask;
+            if (tasks.isEmpty) {
+              return const Center(child: Text('No task available.....!'));
+            }
+
+            return taskProvider.isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : ListView.builder(
+                    itemCount: tasks.length,
+                    itemBuilder: (context, index) {
+                      return TaskCardTile(
+                        taskModel: tasks[index],
+                        onRefreshList: () async {
+                          await taskProvider.fetchTaskByStatus(
+                            context,
+                            'Canceled',
                           );
                         },
-                      ),
-                    ),
+                      );
+                    },
                   );
-          }
+          },
         ),
       ),
     );
   }
-
-
-
-
-  // Future<void> _fetchCanceledTask() async {
-  //   _inProgress = true;
-  //   setState(() {});
-  //
-  //   final NetworkResponse response = await ApiCaller.getRequest(
-  //     url: AppUrls.getCanceledTask,
-  //   );
-  //
-  //   if (response.isSuccess) {
-  //     final TaskListModel taskListModel = TaskListModel.fromJson(
-  //       response.responseData,
-  //     );
-  //     canceledTaskList = taskListModel.data ?? [];
-  //     _inProgress = false;
-  //     setState(() {});
-  //   } else {
-  //     if (mounted) {
-  //       showSnackBarMessage(
-  //         context: context,
-  //         message: response.errorMessage,
-  //         isError: false,
-  //       );
-  //     }
-  //   }
-  // }
 }

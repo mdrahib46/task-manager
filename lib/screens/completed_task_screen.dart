@@ -5,6 +5,7 @@ import 'package:task_manager_app/widgets/task_card_tile.dart';
 
 class CompletedTaskScreen extends StatefulWidget {
   static const String name = 'Completed-Task';
+
   const CompletedTaskScreen({super.key});
 
   @override
@@ -12,21 +13,17 @@ class CompletedTaskScreen extends StatefulWidget {
 }
 
 class _CompletedTaskScreenState extends State<CompletedTaskScreen> {
-
   @override
   void initState() {
     super.initState();
-    Future.microtask(_fetchCompletedTasks);
-  }
 
-  void _fetchCompletedTasks() async {
-    if (!mounted) return;
-    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
-    await taskProvider.fetchTaskByStatus(context , 'Completed');
-  }
+    Future.microtask(() {
+      if (mounted) {
+        final taskProvider = Provider.of<TaskProvider>(context, listen: false);
 
-  void _refreshTaskList() {
-    _fetchCompletedTasks();
+        taskProvider.fetchTaskByStatus(context, 'Completed');
+      }
+    });
   }
 
   @override
@@ -35,28 +32,27 @@ class _CompletedTaskScreenState extends State<CompletedTaskScreen> {
       body: SafeArea(
         child: Consumer<TaskProvider>(
           builder: (context, taskProvider, child) {
-            if (taskProvider.isLoadingTasks) {
-              return const Center(child: CircularProgressIndicator());
-            }
+            final tasks = taskProvider.completeTask;
 
-            final completedTasks = taskProvider.completeTask;
-
-            if (completedTasks.isEmpty) {
-              return const Center(child: Text('No task available.....!'));
-            }
-
-            return ListView.builder(
-              padding: EdgeInsets.zero,
-              itemCount: completedTasks.length,
-              itemBuilder: (context, index) {
-                final task = completedTasks[index];
-                return TaskCardTile(
-                  chipColor: Colors.green.shade700,
-                  taskModel: task,
-                  onRefreshList: _refreshTaskList,
-                );
-              },
-            );
+            return taskProvider.isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : taskProvider.completeTask.isEmpty
+                ? Center(child: Text('No task available ....!'))
+                : ListView.builder(
+                    itemCount: tasks.length,
+                    itemBuilder: (context, index) {
+                      return TaskCardTile(
+                        chipColor: Colors.green,
+                        taskModel: tasks[index],
+                        onRefreshList: () async {
+                          await taskProvider.fetchTaskByStatus(
+                            context,
+                            'Completed',
+                          );
+                        },
+                      );
+                    },
+                  );
           },
         ),
       ),

@@ -14,10 +14,13 @@ class InProgressTaskScreen extends StatefulWidget {
 class _InProgressTaskScreenState extends State<InProgressTaskScreen> {
   @override
   void initState() {
-    Future.microtask((){
-      if(mounted){
-        final TaskProvider taskProvider = Provider.of<TaskProvider>(context, listen: false);
-        taskProvider.fetchTaskByStatus(context, 'Progress');
+    Future.microtask(() async {
+      if (mounted) {
+        final TaskProvider taskProvider = Provider.of<TaskProvider>(
+          context,
+          listen: false,
+        );
+        await taskProvider.fetchTaskByStatus(context, 'Progress');
       }
     });
     super.initState();
@@ -27,54 +30,33 @@ class _InProgressTaskScreenState extends State<InProgressTaskScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child:  Consumer<TaskProvider>(
+        child: Consumer<TaskProvider>(
           builder: (context, taskProvider, child) {
-            return Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              child: Visibility(
-                visible: !taskProvider.isLoadingTasks,
-                replacement: Center(child: CircularProgressIndicator()),
-                child: taskProvider.progressTask.isEmpty ? Center(child: Text('No task available.....!'),) : ListView.builder(
-                  padding: EdgeInsets.zero,
-                  itemCount: taskProvider.progressTask.length,
-                  itemBuilder: (context, index) {
-                    final task = taskProvider.progressTask[index];
-                    return TaskCardTile(
-                      chipColor: Colors.purpleAccent.shade700,
-                      taskModel: task,
-                      onRefreshList: (){},
-                    );
-                  },
-                ),
-              ),
-            );
-          }
+            return taskProvider.progressTask.isEmpty
+                ? const Center(child: Text('No task available.....!'))
+                : taskProvider.isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : ListView.builder(
+                    padding: EdgeInsets.zero,
+                    itemCount: taskProvider.progressTask.length,
+                    itemBuilder: (context, index) {
+                      final task = taskProvider.progressTask[index];
+                      return TaskCardTile(
+                        chipColor: Colors.purpleAccent.shade700,
+                        taskModel: task,
+                        onRefreshList: () async {
+                          await taskProvider.fetchTaskByStatus(
+                            context,
+                            'Progress',
+                          );
+                        },
+                      );
+                    },
+                  );
+          },
         ),
       ),
     );
   }
 
-  // Future<void> _getPendingTask() async {
-  //   _inProgress = true;
-  //   setState(() {});
-  //   final NetworkResponse response = await ApiCaller.getRequest(
-  //     url: AppUrls.getPendingTask,
-  //   );
-  //   _inProgress = false;
-  //   setState(() {});
-  //   if (response.isSuccess) {
-  //     final TaskListModel taskListModel = TaskListModel.fromJson(
-  //       response.responseData,
-  //     );
-  //     _pendingTaskList = taskListModel.data ?? [];
-  //   } else {
-  //     if (mounted) {
-  //       showSnackBarMessage(
-  //         context: context,
-  //         message: response.errorMessage,
-  //         isError: false,
-  //       );
-  //     }
-  //   }
-  // }
 }

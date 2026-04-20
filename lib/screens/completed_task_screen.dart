@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:task_manager_app/data/models/network_response.dart';
-import 'package:task_manager_app/data/models/task_model.dart';
-import 'package:task_manager_app/data/services/api_response.dart';
-import 'package:task_manager_app/utils/app_urls.dart';
-import 'package:task_manager_app/widgets/snackbar_message.dart';
+import 'package:provider/provider.dart';
+import 'package:task_manager_app/provider/task_provider.dart';
 import 'package:task_manager_app/widgets/task_card_tile.dart';
 
 class CompletedTaskScreen extends StatefulWidget {
   static const String name = 'Completed-Task';
+
   const CompletedTaskScreen({super.key});
 
   @override
@@ -15,67 +13,49 @@ class CompletedTaskScreen extends StatefulWidget {
 }
 
 class _CompletedTaskScreenState extends State<CompletedTaskScreen> {
-  bool _inProgress = false;
-  List<TaskModel> _completeTaskList = [];
-
   @override
   void initState() {
-    _fetchCompleteTask();
     super.initState();
+
+    Future.microtask(() {
+      if (mounted) {
+        final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+
+        taskProvider.fetchTaskByStatus(context, 'Completed');
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          child: Visibility(
-            visible: !_inProgress,
-            replacement: Center(child: CircularProgressIndicator()),
-            child: _completeTaskList.isEmpty
-                ? Center(child: Text('No task available.....!'))
+        child: Consumer<TaskProvider>(
+          builder: (context, taskProvider, child) {
+            final tasks = taskProvider.completeTask;
+
+            return taskProvider.isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : taskProvider.completeTask.isEmpty
+                ? Center(child: Text('No task available ....!'))
                 : ListView.builder(
-                    padding: EdgeInsets.zero,
-                    itemCount: _completeTaskList.length,
+                    itemCount: tasks.length,
                     itemBuilder: (context, index) {
-                      final task = _completeTaskList[index];
                       return TaskCardTile(
-                        chipColor: Colors.green.shade700,
-                        taskModel: task,
-                        onRefreshList: _fetchCompleteTask,
+                        chipColor: Colors.green,
+                        taskModel: tasks[index],
+                        onRefreshList: () async {
+                          await taskProvider.fetchTaskByStatus(
+                            context,
+                            'Completed',
+                          );
+                        },
                       );
                     },
-                  ),
-          ),
+                  );
+          },
         ),
       ),
     );
-  }
-
-  Future<void> _fetchCompleteTask() async {
-    _inProgress = true;
-    setState(() {});
-
-    final NetworkResponse response = await ApiCaller.getRequest(
-      url: AppUrls.getCompletedTask,
-    );
-
-    if (response.isSuccess) {
-      final TaskListModel taskListModel = TaskListModel.fromJson(
-        response.responseData,
-      );
-      _completeTaskList = taskListModel.data ?? [];
-      _inProgress = false;
-      setState(() {});
-    } else {
-      if (mounted) {
-        showSnackBarMessage(
-          context: context,
-          message: response.errorMessage,
-          isError: true,
-        );
-      }
-    }
   }
 }

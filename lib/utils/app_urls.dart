@@ -3,7 +3,7 @@
 class AppUrls {
   AppUrls._();
 
-  static const String _baseUrl = 'http://35.73.30.144:2005/api/v1';
+  static const String _baseUrl = 'https://task-manager-api.ostad.live/api/v1';
 
   static const String registration = '$_baseUrl/Registration';
   static const String login = '$_baseUrl/Login';
@@ -14,6 +14,7 @@ class AppUrls {
   static const String createTask = '$_baseUrl/createTask';
   static const String taskStatusCount = '$_baseUrl/taskStatusCount';
   static String deleteTask({required String id}) => '$_baseUrl/deleteTask/$id';
+  static String taskByStatusUrl({required String status}) => '$_baseUrl/listTaskByStatus/$status';
   static String updateTaskByStatus({required String id, required String status}) => '$_baseUrl/updateTaskStatus/$id/$status';
   static const String updateProfile = '$_baseUrl/ProfileUpdate';
   static String recoverVerifyEmail({required String email}) => '$_baseUrl/RecoverVerifyEmail/$email';

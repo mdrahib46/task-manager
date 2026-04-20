@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:task_manager_app/controller/auth_controller.dart';
-import 'package:task_manager_app/data/models/network_response.dart';
-import 'package:task_manager_app/data/models/user_model.dart';
-import 'package:task_manager_app/data/services/api_response.dart';
+import 'package:provider/provider.dart';
+import 'package:task_manager_app/provider/atuh_provider.dart';
 import 'package:task_manager_app/screens/email_verify_screen.dart';
 import 'package:task_manager_app/screens/main_bottom_nav_screen.dart';
 import 'package:task_manager_app/screens/signup_screen.dart';
-import 'package:task_manager_app/utils/app_urls.dart';
 import 'package:task_manager_app/widgets/auth_prompt_text_button.dart';
 import 'package:task_manager_app/widgets/custom_app_background.dart';
 import 'package:task_manager_app/widgets/snackbar_message.dart';
@@ -25,10 +22,10 @@ class _SignInScreenState extends State<SignInScreen> {
   final TextEditingController _emailTEController = TextEditingController();
   final TextEditingController _passwordTEController = TextEditingController();
 
-  bool _inProgress = false;
 
   @override
   Widget build(BuildContext context) {
+    print('Build');
     return Scaffold(
       body: CustomAppBackground(
         child: Padding(
@@ -81,20 +78,24 @@ class _SignInScreenState extends State<SignInScreen> {
                   },
                 ),
                 const SizedBox(height: 16),
-                Visibility(
-                  visible: !_inProgress,
-                  replacement: Center(child: CircularProgressIndicator()),
-                  child: ElevatedButton(
-                    onPressed: _onTapSignIn,
-                    child: Icon(Icons.arrow_forward_ios_rounded),
-                  ),
-                ),
+                 Consumer<AuthProvider>(
+                   builder: (context, authProvider,child) {
+                     return ElevatedButton(
+                        onPressed: authProvider.isLoading ? null :  _onTapSignIn,
+                        child: authProvider.isLoading ? CircularProgressIndicator() :  Icon(Icons.arrow_forward_ios_rounded),
+                      );
+                   }
+                 ),
+
 
                 const SizedBox(height: 24),
                 Center(
                   child: TextButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, EmailVerificationScreen.name);
+                      Navigator.pushNamed(
+                        context,
+                        EmailVerificationScreen.name,
+                      );
                     },
                     child: Text('Forget Password ?'),
                   ),
@@ -122,42 +123,22 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   Future<void> _singIn() async {
-    _inProgress = true;
-    setState(() {});
+    final AuthProvider authProvider = context.read<AuthProvider>();
 
-    final Map<String, dynamic> requestBody = {
-      "email": _emailTEController.text.trim(),
-      "password": _passwordTEController.text,
-    };
-    final NetworkResponse response = await ApiCaller.postRequest(
-      url: AppUrls.login,
-      body: requestBody,
+    final bool isSuccess = await authProvider.signIn(
+      email: _emailTEController.text.trim(),
+      password: _passwordTEController.text,
     );
-
-    _inProgress = false;
-    setState(() {});
-
-    if (response.isSuccess) {
-      await AuthController.saveUserData(
-        response.responseData['token'],
-        UserModel.fromJson(response.responseData['data']),
-      );
-
+    if (isSuccess) {
       if (mounted) {
-        showSnackBarMessage(context: context, message: 'Login successful!');
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          MainBottomNavScreen.name,
-          (route) => false,
-        );
+        showSnackBarMessage(context: context, message: 'Login Successful....!');
+        Navigator.pushNamedAndRemoveUntil(context, MainBottomNavScreen.name, (route)=> false);
       }
-      _clearText();
     } else {
       if (mounted) {
         showSnackBarMessage(
           context: context,
-          message: response.errorMessage,
-          isError: true,
+          message: authProvider.errorMessage.toString(),
         );
       }
     }

@@ -3,7 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:task_manager_app/controller/auth_controller.dart';
 import 'package:task_manager_app/data/models/network_response.dart';
 import 'package:task_manager_app/data/models/user_model.dart';
-import 'package:task_manager_app/data/services/api_response.dart';
+import 'package:task_manager_app/data/services/api_caller.dart';
 import 'package:task_manager_app/screens/main_bottom_nav_screen.dart';
 import 'package:task_manager_app/utils/app_urls.dart';
 import 'package:task_manager_app/widgets/TMAppBar.dart';
@@ -233,6 +233,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     final NetworkResponse response = await ApiCaller.postRequest(
       url: AppUrls.updateProfile,
       body: requestBody,
+      accessToken: ''
     );
 
     if (response.isSuccess) {

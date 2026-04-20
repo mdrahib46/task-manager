@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:task_manager_app/data/models/task_model.dart';
-import 'package:task_manager_app/data/services/api_response.dart';
-import 'package:task_manager_app/utils/app_urls.dart';
-
-import '../data/models/network_response.dart';
+import 'package:task_manager_app/provider/task_provider.dart';
 import 'snackbar_message.dart';
 
 class TaskCardTile extends StatefulWidget {
   const TaskCardTile({
     super.key,
     required this.taskModel,
-    required this.onRefreshList,  this.chipColor = Colors.blue,
+    required this.onRefreshList,
+    this.chipColor = Colors.blue,
   });
 
   final TaskModel taskModel;
@@ -22,10 +21,6 @@ class TaskCardTile extends StatefulWidget {
 }
 
 class _TaskCardTileState extends State<TaskCardTile> {
-  bool _deleteInProgress = false;
-  bool _updateInProgress = false;
-
-
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -78,12 +73,37 @@ class _TaskCardTileState extends State<TaskCardTile> {
                   child: Icon(Icons.edit_note_outlined, color: Colors.green),
                 ),
                 const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: () => _onTapDeleteTask(),
-                  child: Icon(
-                    Icons.delete_forever_outlined,
-                    color: Colors.redAccent,
-                  ),
+                Consumer<TaskProvider>(
+                  builder: (context, taskProvider, child) {
+                    return GestureDetector(
+                      onTap: () async {
+                        final success = await taskProvider.deleteTask(
+                          context,
+                          widget.taskModel.sId!,
+                          widget.taskModel.status!,
+                        );
+
+                        if (success) {
+                          showSnackBarMessage(
+                            context: context,
+                            message: 'Task has been deleted!',
+                          );
+                        } else {
+                          showSnackBarMessage(
+                            context: context,
+                            message: 'Delete failed!',
+                            isError: true,
+                          );
+                        }
+
+                        widget.onRefreshList();
+                      },
+                      child: const Icon(
+                        Icons.delete_forever_outlined,
+                        color: Colors.redAccent,
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
@@ -107,6 +127,7 @@ class _TaskCardTileState extends State<TaskCardTile> {
                 onTap: () {
                   Navigator.pop(context);
                   _onTapUpdateTask('New');
+                  widget.onRefreshList();
                 },
               ),
               ListTile(
@@ -114,6 +135,7 @@ class _TaskCardTileState extends State<TaskCardTile> {
                 onTap: () {
                   Navigator.pop(context);
                   _onTapUpdateTask('Completed');
+                  widget.onRefreshList();
                 },
               ),
               ListTile(
@@ -121,6 +143,7 @@ class _TaskCardTileState extends State<TaskCardTile> {
                 onTap: () {
                   Navigator.pop(context);
                   _onTapUpdateTask('Progress');
+                  widget.onRefreshList();
                 },
               ),
               ListTile(
@@ -128,6 +151,7 @@ class _TaskCardTileState extends State<TaskCardTile> {
                 onTap: () {
                   Navigator.pop(context);
                   _onTapUpdateTask('Canceled');
+                  widget.onRefreshList();
                 },
               ),
             ],
@@ -138,65 +162,29 @@ class _TaskCardTileState extends State<TaskCardTile> {
   }
 
   Future<void> _onTapUpdateTask(String status) async {
-    _updateInProgress = true;
-    setState(() {});
+    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
 
-    final NetworkResponse response = await ApiCaller.getRequest(
-      url: AppUrls.updateTaskByStatus(
-        id: widget.taskModel.sId!,
-        status: status,
-      ),
+    final isSuccess = await taskProvider.updateTask(
+      context: context,
+      taskId: widget.taskModel.sId!,
+      status: status,
     );
 
-    if (response.isSuccess) {
+    if (isSuccess) {
       if (mounted) {
-        widget.onRefreshList();
         showSnackBarMessage(
           context: context,
-          message: 'Task status has been updated....!',
+          message: 'Task updated successfully',
         );
-
       }
     } else {
       if (mounted) {
         showSnackBarMessage(
           context: context,
-          message: "Task status updated failed.....!",
-        );
-      }
-    }
-
-    _updateInProgress = false;
-    setState(() {});
-  }
-
-  Future<void> _onTapDeleteTask() async {
-    _deleteInProgress = true;
-    setState(() {});
-
-    final NetworkResponse response = await ApiCaller.getRequest(
-      url: AppUrls.deleteTask(id: widget.taskModel.sId!),
-    );
-
-    if (response.isSuccess) {
-      if (mounted) {
-        showSnackBarMessage(
-          context: context,
-          message: 'Task has been deleted....!',
-        );
-        widget.onRefreshList();
-      }
-    } else {
-      if (mounted) {
-        showSnackBarMessage(
-          context: context,
-          message: response.errorMessage,
+          message: 'Task update failed....!',
           isError: true,
         );
       }
     }
-
-    _deleteInProgress = false;
-    setState(() {});
   }
 }

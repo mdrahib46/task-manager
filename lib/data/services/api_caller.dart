@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
-import 'package:task_manager_app/controller/auth_controller.dart';
 import 'package:task_manager_app/data/models/network_response.dart';
 
 class ApiCaller {
@@ -10,18 +9,19 @@ class ApiCaller {
 
   ApiCaller._();
 
-  static Future<NetworkResponse> getRequest({required String url}) async {
+  static Future<NetworkResponse> getRequest({
+    required String url,
+    String? accessToken,
+  }) async {
     try {
       Uri uri = Uri.parse(url);
 
       _logRequest(uri.toString());
 
-      Map<String, String> headers = {
-        "Content-Type": "application/json",
-      };
+      Map<String, String> headers = {"Content-Type": "application/json"};
 
-      if (AuthController.accessToken != null) {
-        headers['token'] = AuthController.accessToken!;
+      if (accessToken != null) {
+        headers['token'] = accessToken;
       }
 
       http.Response response = await http.get(uri, headers: headers);
@@ -41,8 +41,7 @@ class ApiCaller {
           return NetworkResponse(
             isSuccess: false,
             statusCode: response.statusCode,
-            errorMessage:
-            decodedResponse['data'] ?? 'Something went wrong!',
+            errorMessage: decodedResponse['data'] ?? 'Something went wrong!',
           );
         }
 
@@ -55,7 +54,8 @@ class ApiCaller {
         return NetworkResponse(
           isSuccess: false,
           statusCode: response.statusCode,
-          errorMessage: decodedResponse['data'] ?? 'Request failed. Try again.....',
+          errorMessage:
+              decodedResponse['data'] ?? 'Request failed. Try again.....',
           responseData: decodedResponse,
         );
       }
@@ -71,14 +71,22 @@ class ApiCaller {
     }
   }
 
-  static Future<NetworkResponse> postRequest(
-      {required String url, Map<String, dynamic>? body}) async {
+  static Future<NetworkResponse> postRequest({
+    required String url,
+    Map<String, dynamic>? body,
+    String? accessToken,
+  }) async {
     try {
       Uri uri = Uri.parse(url);
+
+
       Map<String, String> headers = {
         "Content-Type": "application/json",
-        'token' : AuthController.accessToken.toString()
+
       };
+      if(accessToken != null){
+        headers['token'] = accessToken;
+      }
 
       _logRequest(url);
       final http.Response response = await http.post(
@@ -87,7 +95,9 @@ class ApiCaller {
         body: jsonEncode(body),
       );
 
-      _logger.i("Status Code: ${response.statusCode} \nRequest Response: ${response.body}");
+      _logger.i(
+        "Status Code: ${response.statusCode} \nRequest Response: ${response.body}",
+      );
 
       if (response.statusCode == 200) {
         final decodedData = jsonDecode(response.body);
@@ -104,7 +114,6 @@ class ApiCaller {
           responseData: decodedData,
         );
       } else if (response.statusCode == 401) {
-
         return NetworkResponse(
           isSuccess: false,
           statusCode: response.statusCode,

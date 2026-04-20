@@ -21,10 +21,15 @@ class AuthController {
       _userDataKey,
       jsonEncode(userModelParam.toJson()),
     );
-
     accessToken = accessTokenParam;
     userModel = userModelParam;
   }
+
+  // static Future<void> loadUser() async{
+  //    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  //    sharedPreferences.
+  //
+  // }
 
   static Future<void> getUserData() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();

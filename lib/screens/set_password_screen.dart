@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:task_manager_app/data/models/network_response.dart';
-import 'package:task_manager_app/data/services/api_response.dart';
+import 'package:task_manager_app/data/services/api_caller.dart';
 import 'package:task_manager_app/screens/signin_screen.dart';
 import 'package:task_manager_app/utils/app_urls.dart';
 import 'package:task_manager_app/widgets/auth_prompt_text_button.dart';
@@ -95,6 +95,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     final NetworkResponse response = await ApiCaller.postRequest(
       url: AppUrls.resetPassword,
       body: requestBody,
+      accessToken: ''
     );
 
     if (response.isSuccess) {

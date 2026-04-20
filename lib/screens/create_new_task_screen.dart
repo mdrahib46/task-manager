@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:task_manager_app/data/models/network_response.dart';
-import 'package:task_manager_app/data/services/api_response.dart';
-import 'package:task_manager_app/utils/app_urls.dart';
+import 'package:provider/provider.dart';
+import 'package:task_manager_app/provider/task_provider.dart';
 import 'package:task_manager_app/widgets/TMAppBar.dart';
 import 'package:task_manager_app/widgets/custom_app_background.dart';
-import 'package:task_manager_app/widgets/snackbar_message.dart';
 
 class CreateNewTaskScreen extends StatefulWidget {
   static const String name = '/Create-New-Task';
@@ -20,7 +18,7 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
   final TextEditingController _descriptionTEController =
       TextEditingController();
 
-  bool _inProgress = false;
+  // bool _inProgress = false;
 
   @override
   Widget build(BuildContext context) {
@@ -53,13 +51,25 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
                   maxLines: 10,
                 ),
                 const SizedBox(height: 16),
-                Visibility(
-                  visible: !_inProgress,
-                  replacement: Center(child: CircularProgressIndicator(),),
-                  child: ElevatedButton(
-                    onPressed: _createNewTask,
-                    child: Icon(Icons.arrow_forward_ios_rounded),
-                  ),
+                Consumer<TaskProvider>(
+                  builder: (context, taskProvider, child) {
+                    return Visibility(
+                      visible: !taskProvider.isLoading,
+                      replacement: Center(child: CircularProgressIndicator()),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          context.read<TaskProvider>().createNewTask(
+                            context: context,
+                            title: _subjectTEController.text.trim(),
+                            description: _descriptionTEController.text.trim(),
+                          );
+                          taskProvider.fetchAllTaskCounts(context);
+                          _clearText();
+                        },
+                        child: Icon(Icons.arrow_forward_ios_rounded),
+                      ),
+                    );
+                  }
                 ),
               ],
             ),
@@ -67,42 +77,6 @@ class _CreateNewTaskScreenState extends State<CreateNewTaskScreen> {
         ),
       ),
     );
-  }
-
-  Future<void> _createNewTask() async {
-    _inProgress = true;
-    setState(() {});
-
-    final Map<String, dynamic> requestBody = {
-      "title": _subjectTEController.text.trim(),
-      "description": _descriptionTEController.text.trim(),
-      "status": "New",
-    };
-
-    final NetworkResponse response = await ApiCaller.postRequest(
-      url: AppUrls.createTask,
-      body: requestBody,
-    );
-    _inProgress = false;
-    setState(() {});
-    if (response.isSuccess) {
-      if (mounted) {
-        _clearText();
-        showSnackBarMessage(
-          context: context,
-          message: 'New task has been created....!',
-        );
-        Navigator.pop(context , true);
-      }
-    } else {
-      if (mounted) {
-        showSnackBarMessage(
-          context: context,
-          message: 'New task created failed....!',
-          isError: true,
-        );
-      }
-    }
   }
 
   void _clearText() {

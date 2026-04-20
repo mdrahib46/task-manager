@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:task_manager_app/data/models/network_response.dart';
-import 'package:task_manager_app/data/services/api_response.dart';
+import 'package:provider/provider.dart';
+import 'package:task_manager_app/provider/atuh_provider.dart';
 import 'package:task_manager_app/screens/signin_screen.dart';
-import 'package:task_manager_app/utils/app_urls.dart';
 import 'package:task_manager_app/widgets/auth_prompt_text_button.dart';
 import 'package:task_manager_app/widgets/custom_app_background.dart';
 import 'package:task_manager_app/widgets/snackbar_message.dart';
@@ -23,8 +22,8 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _mobileTEController = TextEditingController();
   final TextEditingController _passwordTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
-  bool _inProgress = false;
+  //
+  // bool _inProgress = false;
   bool _isObSecure = true;
 
   @override
@@ -140,14 +139,17 @@ class _SignupScreenState extends State<SignupScreen> {
                   },
                 ),
                 const SizedBox(height: 16),
-                Visibility(
-                  visible: !_inProgress,
-                  replacement: Center(child: CircularProgressIndicator()),
-                  child: ElevatedButton(
-                    onPressed: _onTapSignUp,
-                    child: Icon(Icons.arrow_forward_ios_rounded),
-                  ),
+                Consumer<AuthProvider>(
+                  builder: (context, authProvider, child) {
+                    return authProvider.isLoading
+                        ? Center(child: CircularProgressIndicator())
+                        : ElevatedButton(
+                            onPressed: _singUp,
+                            child: Icon(Icons.arrow_forward_ios_rounded),
+                          );
+                  },
                 ),
+
                 const SizedBox(height: 40),
                 AuthPromptTextButton(
                   promptText: "Have account? ",
@@ -168,64 +170,51 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  Future<void> _signUp() async {
-    _inProgress = true;
-    setState(() {});
+  // void _onTapSignUp() {
+  //   if (_formKey.currentState!.validate()) {
+  //     _singUp();
+  //   }
+  // }
 
-    final Map<String, dynamic> requestBody = {
-      "email": _emailTEController.text.trim(),
-      "firstName": _firstNameTEController.text.trim(),
-      "lastName": _lastNameTEController.text.trim(),
-      "mobile": _mobileTEController.text.trim(),
-      "password": _passwordTEController.text,
-      "photo": "",
-    };
-    NetworkResponse response = await ApiCaller.postRequest(
-      url: AppUrls.registration,
-      body: requestBody,
+  Future<void> _singUp() async {
+    final AuthProvider authProvider = Provider.of<AuthProvider>(
+      context,
+      listen: false,
     );
 
-    _inProgress = false;
-    setState(() {});
+    final bool isSuccess = await authProvider.signUp(
+      email: _emailTEController.text.trim(),
+      fName: _firstNameTEController.text.trim(),
+      lName: _lastNameTEController.text.trim(),
+      mobile: _mobileTEController.text.trim(),
+      password: _passwordTEController.text.trim(),
+    );
 
-    if (response.isSuccess) {
-      _clearInputText();
+    if (isSuccess) {
       if (mounted) {
         showSnackBarMessage(
           context: context,
-          message: 'Account successfully created....!',
+          message: 'Account created successfully..!',
         );
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          SignInScreen.name,
-          (route) => false,
-        );
+        Navigator.pushNamed(context, SignInScreen.name);
       }
     } else {
       if (mounted) {
         showSnackBarMessage(
           context: context,
-          message: response.errorMessage,
-          isError: true,
+          message: authProvider.errorMessage.toString(),
         );
       }
     }
   }
 
-  void _onTapSignUp() {
-    if (_formKey.currentState!.validate()) {
-      _signUp();
-    }
-    return;
-  }
-
-  void _clearInputText() {
-    _emailTEController.clear();
-    _firstNameTEController.clear();
-    _lastNameTEController.clear();
-    _mobileTEController.clear();
-    _passwordTEController.clear();
-  }
+  // void _clearInputText() {
+  //   _emailTEController.clear();
+  //   _firstNameTEController.clear();
+  //   _lastNameTEController.clear();
+  //   _mobileTEController.clear();
+  //   _passwordTEController.clear();
+  // }
 
   @override
   void dispose() {
